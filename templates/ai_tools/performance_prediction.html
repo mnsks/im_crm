@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Prévisions de Performance</h1>
+    
+    {% if predictions %}
+        <div class="predictions-list">
+            {% for prediction in predictions %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Prévision du {{ prediction.date_prediction|date:"d/m/Y" }}</h5>
+                        
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <div class="metric-card">
+                                    <h6>Performance</h6>
+                                    <div class="metric-value {% if prediction.performance < 0.65 %}text-danger{% elif prediction.performance < 0.8 %}text-warning{% else %}text-success{% endif %}">
+                                        {{ prediction.performance|floatformat:2 }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="metric-card">
+                                    <h6>Satisfaction</h6>
+                                    <div class="metric-value {% if prediction.satisfaction < 0.65 %}text-danger{% elif prediction.satisfaction < 0.8 %}text-warning{% else %}text-success{% endif %}">
+                                        {{ prediction.satisfaction|floatformat:2 }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="metric-card">
+                                    <h6>Qualité</h6>
+                                    <div class="metric-value {% if prediction.qualite < 0.65 %}text-danger{% elif prediction.qualite < 0.8 %}text-warning{% else %}text-success{% endif %}">
+                                        {{ prediction.qualite|floatformat:2 }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if prediction.recommandations %}
+                            <div class="recommendations mt-3">
+                                <h6>Recommandations</h6>
+                                <ul class="list-unstyled">
+                                    {% for recommandation in prediction.recommandations %}
+                                        <li><i class="fas fa-lightbulb"></i> {{ recommandation }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Aucune prévision disponible pour le moment.
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.metric-card {
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    text-align: center;
+}
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+</style>
+{% endblock %}

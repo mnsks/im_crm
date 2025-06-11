@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Détail du centre d'appels</h2>
+    <div class="card mb-3">
+        <div class="card-body position-relative">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h4 class="card-title">{{ centre.nom }}</h4>
+                    <p><strong>Entreprise donneuse d'ordre :</strong> {{ centre.entreprise.nom }}</p>
+                    <p><strong>Type :</strong> {% if centre.is_external %}Externe{% else %}Interne{% endif %}</p>
+                </div>
+                {% if user.is_authenticated and user.role == 'admin' %}
+                <div class="ms-2">
+                    <a href="{% url 'centre_update' centre_id=centre.id %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-edit"></i> Modifier</a>
+                    <a href="{% url 'centre_delete' centre_id=centre.id %}" class="btn btn-outline-danger btn-sm ms-1"><i class="fas fa-trash"></i> Supprimer</a>
+                </div>
+                {% endif %}
+            </div>
+            <hr>
+            <div class="row text-center">
+                <div class="col">
+                    <div class="fw-bold fs-5">{{ agents|length }}</div>
+                    <div class="text-muted">Agents</div>
+                </div>
+                <div class="col">
+                    <div class="fw-bold fs-5">{{ nb_missions }}</div>
+                    <div class="text-muted">Missions</div>
+                </div>
+                <div class="col">
+                    <div class="fw-bold fs-5">{{ nb_kpis }}</div>
+                    <div class="text-muted">KPIs</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <h5>Agents rattachés</h5>
+    <ul class="list-group">
+        {% for agent in agents %}
+            <li class="list-group-item">
+                <a href="{% url 'agent_detail' user_id=agent.id %}">{{ agent.get_full_name|default:agent.username }}</a>
+            </li>
+        {% empty %}
+            <li class="list-group-item">Aucun agent rattaché à ce centre.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'missions:list' %}?centre={{ centre.id }}" class="btn btn-primary mt-3">Voir les missions de ce centre</a>
+    <a href="{% url 'agent_list' %}" class="btn btn-secondary mt-3 ms-2">Retour à la liste des agents</a>
+</div>
+{% endblock %}

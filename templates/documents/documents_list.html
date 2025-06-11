@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}Documents{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h2 class="mb-0">
+                        <i class="fas fa-file-alt text-primary"></i> 
+                        Documents
+                    </h2>
+                    <p class="text-muted mb-0">Gérez vos documents par catégorie</p>
+                </div>
+                <a href="{% url 'documents:document_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i> Nouveau document
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-primary active" data-filter="all">
+                    Tous
+                </button>
+                {% for type, label in document_types %}
+                <button type="button" class="btn btn-outline-primary" data-filter="{{ type }}">
+                    {{ label }}
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des documents -->
+    <div class="row">
+        {% for doc_type, docs in documents_par_type.items %}
+        <div class="col-12 mb-4 document-section" data-type="{{ doc_type }}">
+            <h4 class="mb-3">{{ doc_type|title }}s</h4>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Titre</th>
+                            <th>Description</th>
+                            <th>Date de création</th>
+                            <th>Dernière modification</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doc in docs %}
+                        <tr>
+                            <td>
+                                <i class="fas fa-file-{{ doc.type|default:'alt' }} text-primary me-2"></i>
+                                {{ doc.titre }}
+                            </td>
+                            <td>{{ doc.description|truncatechars:100 }}</td>
+                            <td>{{ doc.date_creation|date:"d/m/Y H:i" }}</td>
+                            <td>{{ doc.date_modification|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ doc.fichier.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    {% if user.is_staff or user.entreprise == doc.entreprise %}
+                                    <a href="{% url 'document_edit' doc.id %}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#deleteModal" 
+                                            data-doc-id="{{ doc.id }}"
+                                            data-doc-title="{{ doc.titre }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">
+                                Aucun document de type {{ doc_type }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer le document "<span id="docTitle"></span>" ?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form id="deleteForm" method="POST" action="">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filtrage des documents
+    const filterButtons = document.querySelectorAll('[data-filter]');
+    const documentSections = document.querySelectorAll('.document-section');
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const filter = button.dataset.filter;
+            
+            // Mise à jour des boutons
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            // Filtrage des sections
+            documentSections.forEach(section => {
+                if (filter === 'all' || section.dataset.type === filter) {
+                    section.style.display = '';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    // Modal de suppression
+    const deleteModal = document.getElementById('deleteModal');
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const docId = button.dataset.docId;
+            const docTitle = button.dataset.docTitle;
+            
+            deleteModal.querySelector('#docTitle').textContent = docTitle;
+            deleteModal.querySelector('#deleteForm').action = `/documents/${docId}/delete/`;
+        });
+    }
+});
+</script>
+{% endblock %}

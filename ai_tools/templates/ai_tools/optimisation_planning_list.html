@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Optimisation des Plannings{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4">Optimisation des Plannings</h1>
+
+    <!-- Formulaire d'optimisation -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-warning">Nouvelle Optimisation</h6>
+        </div>
+        <div class="card-body">
+            <form id="optimisationForm" class="row g-3">
+                {% csrf_token %}
+                <div class="col-md-6">
+                    <label for="date_debut" class="form-label">Date de début</label>
+                    <input type="date" class="form-control" id="date_debut" name="date_debut" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="date_fin" class="form-label">Date de fin</label>
+                    <input type="date" class="form-control" id="date_fin" name="date_fin" required>
+                </div>
+                <div class="col-12 mt-3">
+                    <button type="submit" class="btn btn-warning">
+                        Lancer l'optimisation
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Historique des optimisations -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-warning">Historique des Optimisations</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Score</th>
+                            <th>Agents</th>
+                            <th>Missions</th>
+                            <th>Détails</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for optimisation in optimisations %}
+                        <tr>
+                            <td>{{ optimisation.date_optimisation|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ optimisation.score_optimisation|floatformat:0 }}%" aria-valuenow="{{ optimisation.score_optimisation|floatformat:0 }}" aria-valuemin="0" aria-valuemax="100">
+                                        {{ optimisation.score_optimisation|floatformat:0 }}%
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ optimisation.nombre_agents }}</td>
+                            <td>{{ optimisation.nombre_missions }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning voir-details" 
+                                        data-id="{{ optimisation.id }}"
+                                        data-details="{{ optimisation.details|safe }}">
+                                    Voir détails
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">Aucune optimisation disponible</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if is_paginated %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédent</a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal Détails -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Détails de l'optimisation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="detailsContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#dataTable').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/French.json"
+            }
+        });
+
+        // Gestion du formulaire d'optimisation
+        $('#optimisationForm').submit(function(e) {
+            e.preventDefault();
+            var formData = {
+                date_debut: $('#date_debut').val(),
+                date_fin: $('#date_fin').val()
+            };
+
+            $.ajax({
+                url: '/ai/api/optimisation-planning/optimiser_planning/',
+                method: 'POST',
+                data: formData,
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                success: function(response) {
+                    location.reload();
+                },
+                error: function(xhr, status, error) {
+                    alert('Erreur lors de l\'optimisation');
+                }
+            });
+        });
+
+        // Affichage des détails
+        $('.voir-details').click(function() {
+            var details = $(this).data('details');
+            var detailsHtml = '<pre>' + JSON.stringify(details, null, 2) + '</pre>';
+            $('#detailsContent').html(detailsHtml);
+            $('#detailsModal').modal('show');
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+{% endblock %}

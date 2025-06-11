@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Liste des agents{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-users"></i> Liste des agents</h2>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'agents:create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nouvel agent
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <form method="get" class="form-inline">
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control" placeholder="Rechercher un agent..." value="{{ request.GET.search }}">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Centre d'appels</th>
+                            <th>Missions en cours</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for agent in agents %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'agents:detail' pk=agent.pk %}">
+                                    {{ agent.get_full_name|default:agent.username }}
+                                </a>
+                            </td>
+                            <td>{{ agent.email }}</td>
+                            <td>{{ agent.parent_centre.nom|default:"-" }}</td>
+                            <td>{{ agent.missions_assignees.all|length }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'agents:edit' pk=agent.pk %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'agents:delete' pk=agent.pk %}" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">Aucun agent trouvé</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+<div class="card shadow-sm">
+    {% if card_header %}
+        <div class="card-header py-2">
+            <h6 class="card-title mb-0">{{ card_header }}</h6>
+            {% if card_header_buttons %}
+                <div class="card-header-buttons">
+                    {% for button in card_header_buttons %}
+                        <a href="{{ button.url }}" class="btn btn-sm {{ button.class|default:'btn-outline-primary' }}">
+                            {% if button.icon %}
+                                <i class="fas fa-{{ button.icon }} me-1"></i>
+                            {% endif %}
+                            {{ button.text }}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+    
+    <div class="card-body p-3">
+        {% block card_content %}
+        {% endblock %}
+    </div>
+
+    {% if card_footer %}
+        <div class="card-footer py-2">
+            <small class="text-muted">{{ card_footer }}</small>
+        </div>
+    {% endif %}
+</div>

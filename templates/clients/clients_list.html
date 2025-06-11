@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Liste des Clients{% endblock %}
+
+{% block content %}
+<div class="col-12">
+    <div class="d-flex justify-content-between align-items-center mb-4 pt-4">
+        <h1>Liste des Clients</h1>
+        <a href="{% url 'clients:client_list' %}" class="btn btn-secondary">
+            <i class="fas fa-plus"></i> Nouveau Client
+        </a>
+    </div>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="clients-table" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Téléphone</th>
+                            <th>Date de création</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for client in clients %}
+                        <tr>
+                            <td>{{ client.nom }}</td>
+                            <td>
+                                <a href="mailto:{{ client.email }}">{{ client.email }}</a>
+                            </td>
+                            <td>
+                                <a href="tel:{{ client.telephone }}">{{ client.telephone }}</a>
+                            </td>
+                            <td>{{ client.date_creation|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'clients:client_detail' client.pk %}" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'clients:client_update' client.pk %}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialiser DataTables
+        $('#clients-table').DataTable({
+            language: {
+                url: "{% static 'js/datatables-fr.json' %}"
+            },
+            pageLength: 25,
+            order: [[3, 'desc']], // Trier par date de création décroissante
+            columnDefs: [{
+                targets: -1,
+                orderable: false
+            }]
+        });
+    });
+</script>
+{% endblock %}

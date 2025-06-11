@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Communication{% endblock %}
+
+{% block content %}
+{% comment %}
+<!-- Debug: Désactivé -->
+{% for message in messages %}
+{{ message.expediteur }} -> {{ message.destinataire }} : {{ message.objet }} - {{ message.id }}
+{% endfor %}
+{% endcomment %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Communication</h1>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#messageModal">
+            <i class="fas fa-paper-plane"></i> Nouveau Message
+        </button>
+    </div>
+
+    <!-- Liste des messages -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="messages-table" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>De</th>
+                            <th>À</th>
+                            <th>Objet</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for message in communication_messages %}
+                        <tr>
+                            <td>{{ message.date_envoi|date:"d/m/Y H:i" }}</td>
+                            <td>{{ message.expediteur }}</td>
+                            <td>{{ message.destinataire }}</td>
+                            <td>{{ message.objet }}</td>
+                            <td>
+                                <span class="badge bg-{{ message.lu|yesno:'success,warning' }}">
+                                    {{ message.lu|yesno:'Lu,Non lu' }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'communication:message_view' message.id %}" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'communication:message_reply' message.id %}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-reply"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if communication_messages.has_other_pages %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if communication_messages.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ communication_messages.previous_page_number }}">Précédent</a>
+                    </li>
+                    {% endif %}
+
+                    {% for i in communication_messages.paginator.page_range %}
+                    <li class="page-item {% if communication_messages.number == i %}active{% endif %}">
+                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if communication_messages.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ communication_messages.next_page_number }}">Suivant</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nouveau Message -->
+<div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="messageModalLabel">Nouveau Message</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'communication:message_create' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="destinataire" class="form-label">Destinataire</label>
+                        <select name="destinataire" id="destinataire" class="form-select" required>
+                            <option value="">Sélectionner un destinataire</option>
+                            {% for user in users %}
+                            <option value="{{ user.id }}">{{ user }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="objet" class="form-label">Objet</label>
+                        <input type="text" class="form-control" id="objet" name="objet" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contenu" class="form-label">Message</label>
+                        <textarea class="form-control" id="contenu" name="contenu" rows="5" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Envoyer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialiser DataTables
+        $('#messages-table').DataTable({
+            language: {
+                url: "{% static 'js/datatables-fr.json' %}"
+            },
+            pageLength: 25,
+            order: [[0, 'desc']], // Trier par date décroissante
+            columnDefs: [{
+                targets: [4, 5], // Colonnes Statut et Actions
+                orderable: false
+            }]
+        });
+    });
+</script>
+{% endblock %}

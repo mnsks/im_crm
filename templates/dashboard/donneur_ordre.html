@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+  /* Forcer la même hauteur sur les cartes de chaque ligne de graphiques */
+  .equal-height-row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .equal-height {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 340px;
+  }
+  .equal-height .card-body,
+  .equal-height .chart-area,
+  .equal-height .chart-pie {
+    flex: 1 1 auto;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  @media (max-width: 991px) {
+    .equal-height-row {
+      flex-direction: column;
+    }
+    .equal-height {
+      min-height: unset;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block title %}Tableau de bord - Donneur d'ordre{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Tableau de bord Donneur d'Ordre</h1>
+    <!-- En-tête avec statistiques globales -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <h5 class="card-title">Total des missions</h5>
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Missions</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_missions }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <h5 class="card-title">Missions en cours</h5>
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Missions en cours</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ missions_en_cours }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tasks fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <h5 class="card-title">Total des appels</h5>
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Total Appels</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_appels }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-phone fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <h5 class="card-title">Appels réussis</h5>
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Appels réussis</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ appels_reussis }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div class="row equal-height-row">
+        <!-- Graphique des appels par jour -->
+        <div class="col-xl-8 col-lg-7 h-100">
+            <div class="card shadow mb-4 equal-height">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Évolution des appels</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="appelsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Graphique des statuts de missions -->
+        <div class="col-xl-4 col-lg-5 h-100">
+            <div class="card shadow mb-4 equal-height">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Statuts des missions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4">
+                        <canvas id="missionsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row equal-height-row">
+        <!-- Graphique des durées moyennes -->
+        <div class="col-xl-8 col-lg-7 h-100">
+            <div class="card shadow mb-4 equal-height">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Durée moyenne des appels</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="dureesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Graphique des statuts d'appels -->
+        <div class="col-xl-4 col-lg-5 h-100">
+            <div class="card shadow mb-4 equal-height">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Statuts des appels</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4">
+                        <canvas id="statutsAppelsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Données pour les graphiques
+    console.log('Raw chart_data:', '{{ chart_data|escapejs }}');
+    var chartData = JSON.parse('{{ chart_data|escapejs }}');
+    console.log('Parsed Chart Data:', chartData);
+    console.log('Dates:', chartData.dates);
+    console.log('Nombre d\'appels:', chartData.nbAppels);
+    console.log('Durées moyennes:', chartData.dureesMoyennes);
+    console.log('Labels missions:', chartData.missionsLabels);
+    console.log('Valeurs missions:', chartData.missionsValues);
+    console.log('Labels statuts:', chartData.statutsLabels);
+    console.log('Valeurs statuts:', chartData.statutsValues);
+
+    // Graphique des appels par jour
+    new Chart(document.getElementById('appelsChart'), {
+        type: 'line',
+        data: {
+            labels: chartData.dates,
+            datasets: [{
+                label: 'Nombre d\'appels',
+                data: chartData.nbAppels,
+                borderColor: '#4e73df',
+                backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Graphique des durées moyennes
+    new Chart(document.getElementById('dureesChart'), {
+        type: 'line',
+        data: {
+            labels: chartData.dates,
+            datasets: [{
+                label: 'Durée moyenne (secondes)',
+                data: chartData.dureesMoyennes,
+                borderColor: '#1cc88a',
+                backgroundColor: 'rgba(28, 200, 138, 0.05)',
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Graphique des statuts de missions
+    new Chart(document.getElementById('missionsChart'), {
+        type: 'doughnut',
+        data: {
+            labels: chartData.missionsLabels,
+            datasets: [{
+                data: chartData.missionsValues,
+                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e'],
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Graphique des statuts d'appels
+    new Chart(document.getElementById('statutsAppelsChart'), {
+        type: 'doughnut',
+        data: {
+            labels: chartData.statutsLabels,
+            datasets: [{
+                data: chartData.statutsValues,
+                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'],
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

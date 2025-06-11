@@ -1,0 +1,490 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+  <h1>Guide Utilisateur - CRM</h1>
+  <p class="lead">Ce guide vous accompagne dans l'utilisation du CRM selon votre rôle. Utilisez le sommaire pour accéder rapidement à la section souhaitée.</p>
+
+  <nav class="mb-4">
+    <b>Sommaire :</b>
+    <ul class="list-unstyled">
+      <li><a href="#introduction">1. Introduction générale</a></li>
+      <li><a href="#navigation">2. Navigation globale</a></li>
+      <li><a href="#roles">3. Guide par rôle</a>
+        <ul>
+          <li><a href="#admin">Administrateur</a></li>
+          <li><a href="#donneur">Donneur d'Ordre</a></li>
+          <li><a href="#centre">Centre d'Appel</a></li>
+          <li><a href="#agent">Agent</a></li>
+          <li><a href="#client">Client final</a></li>
+        </ul>
+      </li>
+      <li><a href="#transverse">4. Fonctionnalités transverses</a></li>
+      <li><a href="#faq">5. FAQ et dépannage</a></li>
+      <li><a href="#annexes">6. Annexes (captures, vidéos, glossaire...)</a></li>
+    </ul>
+  </nav>
+
+  <h2 id="workflow">Workflow complet d'une opération</h2>
+  <div class="workflow-section">
+    <div class="timeline">
+      <div class="timeline-item">
+        <h4>1. Phase Initiale - Entreprise Donneuse d'Ordre (EDO)</h4>
+        <ul>
+          <li>Inscription de l'entreprise sur la plateforme</li>
+          <li>Création des comptes donneurs d'ordre</li>
+          <li>Configuration des préférences et paramètres</li>
+        </ul>
+      </div>
+      <div class="timeline-item">
+        <h4>2. Création de Mission - Donneur d'Ordre</h4>
+        <ul>
+          <li>Définition du titre et des objectifs</li>
+          <li>Spécification des KPIs et métriques</li>
+          <li>Sélection du centre d'appels partenaire</li>
+          <li>Upload des documents nécessaires</li>
+          <li>Configuration des délais et priorités</li>
+        </ul>
+      </div>
+      <div class="timeline-item">
+        <h4>3. Préparation - Centre d'Appels</h4>
+        <ul>
+          <li>Réception et analyse de la mission</li>
+          <li>Sélection et assignation des agents qualifiés</li>
+          <li>Planification des horaires et ressources</li>
+          <li>Préparation des scripts et supports</li>
+          <li>Formation spécifique si nécessaire</li>
+        </ul>
+      </div>
+      <div class="timeline-item">
+        <h4>4. Exécution - Agent</h4>
+        <ul>
+          <li>Consultation du planning quotidien</li>
+          <li>Prise de connaissance des objectifs</li>
+          <li>Contact avec les clients finaux</li>
+          <li>Saisie des résultats en temps réel</li>
+          <li>Mise à jour des statuts d'appel</li>
+        </ul>
+      </div>
+      <div class="timeline-item">
+        <h4>5. Interaction - Client Final</h4>
+        <ul>
+          <li>Réception des appels des agents</li>
+          <li>Consultation de l'historique des appels</li>
+          <li>Soumission de requêtes si besoin</li>
+          <li>Envoi de feedback sur les interactions</li>
+          <li>Mise à jour des préférences de contact</li>
+        </ul>
+      </div>
+      <div class="timeline-item">
+        <h4>6. Supervision - Centre d'Appels</h4>
+        <ul>
+          <li>Monitoring en temps réel des KPIs</li>
+          <li>Contrôle qualité des appels</li>
+          <li>Ajustement des ressources si nécessaire</li>
+          <li>Gestion des incidents et urgences</li>
+          <li>Communication avec le donneur d'ordre</li>
+        </ul>
+      </div>
+      <div class="timeline-item">
+        <h4>7. Suivi - Donneur d'Ordre</h4>
+        <ul>
+          <li>Consultation des tableaux de bord</li>
+          <li>Analyse des KPIs et métriques</li>
+          <li>Revoir les feedbacks clients</li>
+          <li>Ajustement des objectifs si nécessaire</li>
+          <li>Validation des résultats</li>
+        </ul>
+      </div>
+      <div class="timeline-item">
+        <h4>8. Clôture - Tous les Acteurs</h4>
+        <ul>
+          <li>Génération des rapports finaux</li>
+          <li>Analyse des performances globales</li>
+          <li>Évaluation de la satisfaction client</li>
+          <li>Identification des points d'amélioration</li>
+          <li>Archivage des documents et données</li>
+        </ul>
+      </div>
+    </div>
+    <div class="alert alert-success mt-4">
+      <h5>Points Clés du Workflow</h5>
+      <ul>
+        <li><b>Traçabilité :</b> Chaque action est enregistrée et horodatée</li>
+        <li><b>Communication :</b> Tous les acteurs sont informés en temps réel</li>
+        <li><b>Flexibilité :</b> Adaptation possible à chaque étape</li>
+        <li><b>Qualité :</b> Contrôles à chaque niveau</li>
+      </ul>
+    </div>
+    <style>
+      .timeline {
+        position: relative;
+        padding-left: 30px;
+      }
+      .timeline:before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #dee2e6;
+      }
+      .timeline-item {
+        position: relative;
+        margin-bottom: 30px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 5px;
+        border-left: 3px solid #007bff;
+      }
+      .timeline-item:before {
+        content: '';
+        position: absolute;
+        left: -38px;
+        top: 25px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #007bff;
+      }
+      .timeline-item h4 {
+        color: #007bff;
+        margin-bottom: 15px;
+      }
+      .timeline-item ul {
+        margin-bottom: 0;
+      }
+      .timeline-item:hover {
+        background-color: #e9ecef;
+      }
+    </style>
+  </div>
+
+  <h2 id="introduction">1. Introduction générale</h2>
+  <p>Bienvenue dans le guide utilisateur du CRM. Ce document a pour but de vous accompagner dans l'utilisation de la plateforme en fonction de votre rôle.</p>
+
+  <h3>Objectifs du guide</h3>
+  <ul>
+    <li>Présenter les fonctionnalités principales</li>
+    <li>Expliquer les processus clés</li>
+    <li>Fournir des réponses aux questions fréquentes</li>
+    <li>Faciliter la prise en main de l'outil</li>
+  </ul>
+
+  <h3>Structure du guide</h3>
+  <ol>
+    <li>Introduction générale</li>
+    <li>Navigation globale</li>
+    <li>Guide par rôle utilisateur</li>
+    <li>Fonctionnalités transverses</li>
+    <li>FAQ et dépannage</li>
+    <li>Annexes</li>
+  </ol>
+
+  <h2 id="navigation">2. Navigation globale</h2>
+  <p>La plateforme propose une interface intuitive organisée comme suit :</p>
+  
+  <h4>Barre supérieure</h4>
+  <ul>
+    <li>Logo et nom de l'application</li>
+    <li>Menu utilisateur (profil, paramètres, déconnexion)</li>
+    <li>Recherche globale</li>
+    <li>Notifications</li>
+  </ul>
+
+  <h4>Menu latéral</h4>
+  <ul>
+    <li>Tableau de bord</li>
+    <li>Missions</li>
+    <li>Clients</li>
+    <li>Rapports</li>
+    <li>Paramètres</li>
+  </ul>
+
+  <h4>Zone de contenu principal</h4>
+  <p>Espace dédié à l'affichage des informations spécifiques à chaque section.</p>
+
+  <h2 id="roles">3. Guide par rôle</h2>
+  <p>Les fonctionnalités disponibles varient selon votre rôle dans l'application.</p>
+
+  <h3 id="admin">Administrateur</h3>
+  <p>L'administrateur a accès à toutes les fonctionnalités du système.</p>
+  
+  <h4>Gestion des utilisateurs</h4>
+  <ul>
+    <li>Création et gestion des comptes</li>
+    <li>Attribution des rôles et permissions</li>
+    <li>Gestion des accès</li>
+  </ul>
+
+  <h4>Configuration</h4>
+  <ul>
+    <li>Paramètres généraux</li>
+    <li>Gestion des modèles</li>
+    <li>Personnalisation de l'interface</li>
+  </ul>
+
+  <h3 id="donneur">Donneur d'Ordre</h3>
+  <p>Le donneur d'ordre peut gérer ses missions et suivre les performances.</p>
+  
+  <h4>Tableau de bord</h4>
+  <ul>
+    <li>Vue d'ensemble des KPIs</li>
+    <li>Graphiques de performance</li>
+    <li>Alertes et notifications</li>
+  </ul>
+
+  <h4>Missions</h4>
+  <ul>
+    <li>Création de nouvelles missions</li>
+    <li>Suivi en temps réel</li>
+    <li>Analyse des résultats</li>
+  </ul>
+
+  <h3 id="centre">Centre d'Appel</h3>
+  <p>Le centre d'appel gère l'exécution des missions.</p>
+  
+  <h4>Supervision</h4>
+  <ul>
+    <li>Monitoring des appels</li>
+    <li>Gestion des ressources</li>
+    <li>Contrôle qualité</li>
+  </ul>
+
+  <h4>Rapports</h4>
+  <ul>
+    <li>Génération de rapports</li>
+    <li>Analyse des performances</li>
+    <li>Indicateurs clés</li>
+  </ul>
+
+  <h3 id="agent">Agent</h3>
+  <p>L'agent exécute les missions qui lui sont assignées.</p>
+  
+  <h4>Planning</h4>
+  <ul>
+    <li>Vue quotidienne/hebdomadaire</li>
+    <li>Liste des tâches</li>
+    <li>Priorités</li>
+  </ul>
+
+  <h4>Exécution</h4>
+  <ul>
+    <li>Passation d'appels</li>
+    <li>Saisie des résultats</li>
+    <li>Gestion des rappels</li>
+  </ul>
+
+  <h3 id="client">Client final</h3>
+  <p>Le client final interagit avec les agents.</p>
+  
+  <h4>Espace personnel</h4>
+  <ul>
+    <li>Profil</li>
+    <li>Historique des interactions</li>
+    <li>Préférences</li>
+  </ul>
+
+  <h4>Support</h4>
+  <ul>
+    <li>FAQ</li>
+    <li>Contact</li>
+    <li>Assistance</li>
+  </ul>
+
+  <h2 id="transverse">4. Fonctionnalités transverses</h2>
+  <p>Certaines fonctionnalités sont accessibles à plusieurs rôles.</p>
+
+  <h4>Messagerie</h4>
+  <ul>
+    <li>Envoi et réception de messages</li>
+    <li>Pièces jointes</li>
+    <li>Notifications</li>
+  </ul>
+
+  <h4>Recherche</h4>
+  <ul>
+    <li>Recherche globale</li>
+    <li>Filtres avancés</li>
+    <li>Historique des recherches</li>
+  </ul>
+
+  <h4>Export</h4>
+  <ul>
+    <li>Génération de PDF</li>
+    <li>Export Excel</li>
+    <li>Partage</li>
+  </ul>
+
+  <h2 id="faq">5. FAQ et dépannage</h2>
+  <h4>Questions générales</h4>
+  <ul>
+    <li><b>Problème de connexion :</b> Vérifiez vos identifiants, contactez l'administrateur</li>
+    <li><b>Mot de passe oublié :</b> Utilisez la fonction « mot de passe oublié » ou contactez l'administrateur</li>
+    <li><b>Erreur lors de la saisie :</b> Vérifiez les champs obligatoires et le format des données</li>
+    <li><b>Fonctionnalité inaccessible :</b> Vérifiez votre rôle ou contactez le support</li>
+    <li><b>Où trouver les rapports ?</b> Menu « Rapports » selon votre rôle</li>
+    <li><b>Comment contacter le support ?</b> Via la messagerie ou l'administrateur</li>
+  </ul>
+
+  <h4>Administrateur</h4>
+  <ul>
+    <li><b>Comment ajouter un nouvel agent ?</b><br>Rendez-vous dans la section "Gestion des Agents" puis cliquez sur "Ajouter un agent".</li>
+    <li><b>Comment suivre les KPIs ?</b><br>Utilisez le menu "KPIs" pour accéder aux tableaux de bord détaillés.</li>
+  </ul>
+
+  <h4>Centre d'appel</h4>
+  <ul>
+    <li><b>Comment planifier une mission ?</b><br>Depuis "Missions", cliquez sur "Nouvelle mission" et remplissez le formulaire.</li>
+    <li><b>Où trouver les rapports ?</b><br>Accédez à la section "Rapports" dans la barre latérale.</li>
+  </ul>
+
+  <h4>Donneur d'Ordre</h4>
+  <ul>
+    <li><b>Comment consulter les documents ?</b><br>Utilisez le menu "Documents" pour voir ou télécharger vos fichiers.</li>
+    <li><b>Comment envoyer un feedback ?</b><br>La section "Feedbacks" vous permet de donner votre avis sur chaque mission.</li>
+  </ul>
+
+  <h4>Agent</h4>
+  <ul>
+    <li><b>Comment remplir mon rapport journalier ?</b><br>Allez dans "Rapport journalier" et complétez le formulaire en fin de journée.</li>
+    <li><b>Comment accéder à mes formations ?</b><br>Le menu "Formations" liste toutes vos sessions assignées.</li>
+  </ul>
+
+  <h4>Client final</h4>
+  <ul>
+    <li><b>Comment voir l'historique de mes appels ?</b><br>Menu "Historique" dans votre espace personnel.</li>
+    <li><b>Comment modifier mes informations ?</b><br>Menu "Profil" puis "Modifier mes informations".</li>
+  </ul>
+
+  <h2 id="annexes">6. Annexes</h2>
+  
+  <h4>Nouvelles fonctionnalités</h4>
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Tableau de bord personnalisé</h5>
+          <p class="card-text">Visualisez vos indicateurs clés en un coup d'œil avec le nouveau tableau de bord personnalisable.</p>
+          <ul class="list-unstyled">
+            <li>✔ Statistiques en temps réel</li>
+            <li>✔ Graphiques interactifs</li>
+            <li>✔ Vue d'ensemble des missions</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Gestion des interactions</h5>
+          <p class="card-text">Suivez toutes vos interactions avec les clients en un seul endroit.</p>
+          <ul class="list-unstyled">
+            <li>✔ Historique complet des appels</li>
+            <li>✔ Notes et commentaires</li>
+            <li>✔ Suivi des actions à faire</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h4>Glossaire</h4>
+  <div class="row">
+    <div class="col-md-6">
+      <dl class="row">
+        <dt class="col-sm-4">CRM</dt>
+        <dd class="col-sm-8">Gestion de la Relation Client</dd>
+        
+        <dt class="col-sm-4">KPI</dt>
+        <dd class="col-sm-8">Indicateur Clé de Performance</dd>
+        
+        <dt class="col-sm-4">EDO</dt>
+        <dd class="col-sm-8">Entreprise Donneuse d'Ordre</dd>
+        
+        <dt class="col-sm-4">CA</dt>
+        <dd class="col-sm-8">Centre d'Appels</dd>
+      </dl>
+    </div>
+    <div class="col-md-6">
+      <dl class="row">
+        <dt class="col-sm-4">NPS</dt>
+        <dd class="col-sm-8">Net Promoter Score - Mesure de satisfaction client</dd>
+        
+        <dt class="col-sm-4">SLA</dt>
+        <dd class="col-sm-8">Accord de Niveau de Service</dd>
+        
+        <dt class="col-sm-4">TMA</dt>
+        <dd class="col-sm-8">Temps Moyen d'Appel</dd>
+      </dl>
+    </div>
+  </div>
+
+  <h4 class="mt-4">Conseils pratiques</h4>
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card mb-3">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">Pour les agents</h5>
+        </div>
+        <div class="card-body">
+          <ul class="mb-0">
+            <li>Planifiez vos appels importants en début de journée</li>
+            <li>Utilisez les modèles de réponse pour gagner du temps</li>
+            <li>Mettez à jour systématiquement les statuts des appels</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card mb-3">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">Pour les responsables</h5>
+        </div>
+        <div class="card-body">
+          <ul class="mb-0">
+            <li>Consultez régulièrement les tableaux de bord</li>
+            <li>Planifiez des revues d'équipe hebdomadaires</li>
+            <li>Utilisez les filtres pour analyser les performances</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h4>Raccourcis clavier</h4>
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead class="table-light">
+        <tr>
+          <th>Action</th>
+          <th>Raccourci</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Nouvelle mission</td>
+          <td><kbd>Ctrl</kbd> + <kbd>N</kbd></td>
+          <td>Créer une nouvelle mission</td>
+        </tr>
+        <tr>
+          <td>Recherche</td>
+          <td><kbd>Ctrl</kbd> + <kbd>F</kbd></td>
+          <td>Ouvrir la barre de recherche</td>
+        </tr>
+        <tr>
+          <td>Tableau de bord</td>
+          <td><kbd>Alt</kbd> + <kbd>D</kbd></td>
+          <td>Retour au tableau de bord</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="alert alert-secondary mt-4">
+    <b>Retour à la navigation :</b> <a href="#introduction">Introduction</a> | <a href="#roles">Rôles</a> | <a href="#faq">FAQ</a> | <a href="#annexes">Annexes</a>
+  </div>
+</div>
+{% endblock %}

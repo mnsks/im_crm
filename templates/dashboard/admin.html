@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord Administrateur{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2 class="mb-3">
+                <i class="fas fa-tachometer-alt text-primary"></i> 
+                Tableau de bord Administrateur
+            </h2>
+            <p class="text-muted">Vue d'ensemble de la plateforme</p>
+        </div>
+    </div>
+
+    <!-- Cartes statistiques -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-building text-primary"></i> Entreprises</h5>
+                    <p class="display-5">{{ nb_entreprises }}</p>
+                    <p class="text-muted small">Total des entreprises inscrites</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-headset text-success"></i> Centres d'appels</h5>
+                    <p class="display-5">{{ nb_centres }}</p>
+                    <p class="text-muted small">Centres d'appels actifs</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-users text-info"></i> Agents</h5>
+                    <p class="display-5">{{ nb_agents }}</p>
+                    <p class="text-muted small">Agents enregistrés</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-tasks text-warning"></i> Missions</h5>
+                    <p class="display-5">{{ nb_missions }}</p>
+                    <p class="text-muted small">Missions en cours</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques et tableaux -->
+    <div class="row mt-4">
+        <!-- Graphique des missions -->
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-chart-pie text-primary"></i> État des missions</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="missionsChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Graphique des formations -->
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-graduation-cap text-success"></i> Formations</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="formationsChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activités récentes et alertes -->
+    <div class="row mt-4">
+        <!-- Dernières activités -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-history text-info"></i> Activités récentes</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="mb-3">Missions récentes</h6>
+                            {% for mission in recent_missions %}
+                            <div class="mission-item mb-3">
+                                <h6 class="mb-1">{{ mission.titre }}</h6>
+                                <p class="text-muted mb-1">
+                                    <small>
+                                        {{ mission.entreprise.nom }} - 
+                                        {{ mission.date_debut|date:"d/m/Y" }}
+                                    </small>
+                                </p>
+                                <div class="progress" style="height: 5px;">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: {{ mission.progression }}%" 
+                                         aria-valuenow="{{ mission.progression }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted text-center">Aucune mission récente</p>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="mb-3">Feedbacks récents</h6>
+                            {% include "dashboard/includes/feedback_list.html" %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alertes système -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-bell text-warning"></i> Alertes système</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for alert in system_alerts %}
+                        <li class="list-group-item">
+                            <i class="fas fa-exclamation-circle {% if alert.level == 'danger' %}text-danger{% elif alert.level == 'warning' %}text-warning{% else %}text-info{% endif %}"></i>
+                            {{ alert.message }}
+                            <small class="d-block text-muted">{{ alert.date }}</small>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item text-center">Aucune alerte</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Attendre que le DOM soit chargé
+document.addEventListener('DOMContentLoaded', function() {
+    // Récupérer les canvas
+    const missionsChart = document.getElementById('missionsChart');
+    const formationsChart = document.getElementById('formationsChart');
+
+    if (missionsChart) {
+        // Données du graphique des missions
+        const missionsData = {
+            labels: ['En cours', 'Terminées', 'En attente', 'Annulées'],
+            datasets: [{
+                data: [{{ missions_en_cours }}, {{ missions_terminees }}, {{ missions_en_attente }}, {{ missions_annulees }}],
+                backgroundColor: ['#00BFFF', '#28a745', '#ffc107', '#dc3545'],
+                borderWidth: 2,
+                borderColor: '#fff',
+                hoverOffset: 4
+            }]
+        };
+
+        // Configuration du graphique des missions
+        const missionsConfig = {
+            type: 'doughnut',
+            data: missionsData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            font: { size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        titleColor: '#000',
+                        bodyColor: '#666',
+                        borderColor: '#ddd',
+                        borderWidth: 1,
+                        padding: 10,
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
+                }
+            }
+        };
+
+        // Créer le graphique des missions
+        new Chart(missionsChart, missionsConfig);
+    }
+
+    if (formationsChart) {
+        // Données du graphique des formations
+        const formationsData = {
+            labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'],
+            datasets: [{
+                label: 'Formations réalisées',
+                data: {{ formations_data|safe }},
+                backgroundColor: 'rgba(0, 51, 102, 0.1)',
+                borderColor: '#003366',
+                borderWidth: 2,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#003366',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                tension: 0.4,
+                fill: true
+            }]
+        };
+
+        // Configuration du graphique des formations
+        const formationsConfig = {
+            type: 'line',
+            data: formationsData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        titleColor: '#000',
+                        bodyColor: '#666',
+                        borderColor: '#ddd',
+                        borderWidth: 1,
+                        padding: 10,
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.raw} formations`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        };
+
+        // Créer le graphique des formations
+        new Chart(formationsChart, formationsConfig);
+    }
+
+    // Afficher les données dans la console pour le débogage
+    console.log('Données des missions:', [{{ missions_en_cours }}, {{ missions_terminees }}, {{ missions_en_attente }}, {{ missions_annulees }}]);
+    console.log('Données des formations:', {{ formations_data|safe }});
+});
+</script>
+{% endblock %}

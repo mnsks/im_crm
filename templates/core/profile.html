@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Mon Profil{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title mb-0">
+                        <i class="fas fa-user text-info me-2"></i>Mon Profil
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-auto">
+                            <div class="avatar-circle bg-info text-white d-flex align-items-center justify-content-center" style="width: 100px; height: 100px; border-radius: 50%;">
+                                <i class="fas fa-user-circle fa-3x"></i>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h3 class="mb-1">{{ user.get_full_name|default:user.username }}</h3>
+                            <p class="text-muted mb-2">{{ user.email }}</p>
+                            <span class="badge bg-info">{{ user.get_role_display }}</span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4 class="mb-3">Informations</h4>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <strong>Nom d'utilisateur:</strong> {{ user.username }}
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Email:</strong> {{ user.email }}
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Rôle:</strong> {{ user.get_role_display }}
+                                </li>
+                                {% if user.date_joined %}
+                                <li class="mb-2">
+                                    <strong>Membre depuis:</strong> {{ user.date_joined|date:"d/m/Y" }}
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h4 class="mb-3">Statistiques</h4>
+                            <ul class="list-unstyled">
+                                {% if user.role == 'agent' %}
+                                <li class="mb-2">
+                                    <strong>Appels traités:</strong> {{ user.appels_count|default:"0" }}
+                                </li>
+                                {% endif %}
+                                {% if user.role == 'centre' %}
+                                <li class="mb-2">
+                                    <strong>Agents supervisés:</strong> {{ user.agents_count|default:"0" }}
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                            <i class="fas fa-edit me-2"></i>Modifier mon profil
+                        </button>
+                        <button type="button" class="btn btn-outline-info ms-2" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                            <i class="fas fa-key me-2"></i>Changer le mot de passe
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edition Profil -->
+<div class="modal fade" id="editProfileModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modifier mon profil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <!-- Les champs seront ajoutés ici une fois le formulaire créé -->
+                    <div class="mb-3">
+                        <label class="form-label">Nom</label>
+                        <input type="text" class="form-control" name="first_name" value="{{ user.first_name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Prénom</label>
+                        <input type="text" class="form-control" name="last_name" value="{{ user.last_name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" value="{{ user.email }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-info">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Changement Mot de passe -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Changer le mot de passe</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'core:change_password' %}">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Ancien mot de passe</label>
+                        <input type="password" class="form-control" name="old_password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nouveau mot de passe</label>
+                        <input type="password" class="form-control" name="new_password1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Confirmer le nouveau mot de passe</label>
+                        <input type="password" class="form-control" name="new_password2" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-info">Changer le mot de passe</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Détail de l'agent{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-user"></i> {{ agent.get_full_name|default:agent.username }}</h2>
+        </div>
+        <div class="col-auto">
+            <div class="btn-group">
+                <a href="{% url 'agents:edit' pk=agent.pk %}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Modifier
+                </a>
+                <a href="{% url 'agents:delete' pk=agent.pk %}" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Supprimer
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Informations générales</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Nom d'utilisateur</dt>
+                        <dd class="col-sm-8">{{ agent.username }}</dd>
+
+                        <dt class="col-sm-4">Email</dt>
+                        <dd class="col-sm-8">{{ agent.email }}</dd>
+
+                        <dt class="col-sm-4">Centre d'appels</dt>
+                        <dd class="col-sm-8">{{ agent.parent_centre.nom|default:"-" }}</dd>
+
+                        <dt class="col-sm-4">Date d'inscription</dt>
+                        <dd class="col-sm-8">{{ agent.date_joined|date:"d/m/Y" }}</dd>
+
+                        <dt class="col-sm-4">Dernière connexion</dt>
+                        <dd class="col-sm-8">{{ agent.last_login|date:"d/m/Y H:i"|default:"-" }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Missions en cours</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for mission in agent.missions_assignees.all %}
+                        <a href="{% url 'missions:mission_detail' pk=mission.pk %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ mission.titre }}</h6>
+                                <small>{{ mission.date_debut|date:"d/m/Y" }}</small>
+                            </div>
+                            <p class="mb-1">{{ mission.description|truncatewords:20 }}</p>
+                            <small>{{ mission.entreprise.nom }}</small>
+                        </a>
+                        {% empty %}
+                        <div class="text-center text-muted">
+                            Aucune mission en cours
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

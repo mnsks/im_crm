@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Inscription à une formation</h2>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    <div class="card">
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="id_nom_prenom" class="form-label">Nom et prénom</label>
+                        {% render_field form.nom_prenom class="form-control" %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_email" class="form-label">Adresse mail</label>
+                        {% render_field form.email class="form-control" %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_telephone" class="form-label">Téléphone</label>
+                        {% render_field form.telephone class="form-control" %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_date_naissance" class="form-label">Date de naissance</label>
+                        {% render_field form.date_naissance class="form-control" %}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="id_budget" class="form-label">Budget</label>
+                        {% render_field form.budget class="form-control" %}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="id_num_edof" class="form-label">Numéro EDOF</label>
+                        {% render_field form.num_edof class="form-control" %}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="id_formation" class="form-label">Formation</label>
+                        {% render_field form.formation class="form-control" %}
+                    </div>
+                    <div class="col-12">
+                        <label for="id_adresse_postale" class="form-label">Adresse postale</label>
+                        {% render_field form.adresse_postale class="form-control" %}
+                    </div>
+                </div>
+                <div class="mt-4 text-end">
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

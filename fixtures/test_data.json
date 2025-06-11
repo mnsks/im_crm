@@ -1,0 +1,120 @@
+[
+  {
+    "model": "core.entreprisedonneuseordre",
+    "pk": 1,
+    "fields": {
+      "nom": "Entreprise Alpha",
+      "description": "Client principal",
+      "espace_documents": "",
+      "created_at": "2025-06-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "core.centreappels",
+    "pk": 1,
+    "fields": {
+      "nom": "Centre Paris",
+      "is_external": false,
+      "entreprise": 1,
+      "espace_saisie": "",
+      "created_at": "2025-06-01T10:10:00Z"
+    }
+  },
+  {
+    "model": "core.user",
+    "pk": 1,
+    "fields": {
+      "username": "agent1",
+      "password": "pbkdf2_sha256$260000$testhash$testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest",
+      "role": "agent",
+      "parent_centre": 1,
+      "parent_entreprise": 1,
+      "parent_client_entreprise": null,
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.clientfinal",
+    "pk": 1,
+    "fields": {
+      "nom": "Client Final 1",
+      "email": "client1@example.com",
+      "telephone": "0600000001",
+      "entreprise": 1,
+      "created_at": "2025-06-01T11:00:00Z"
+    }
+  },
+  {
+    "model": "missions.mission",
+    "pk": 1,
+    "fields": {
+      "titre": "Mission Commerciale",
+      "description": "Prospection nouveaux clients",
+      "type": "commercial",
+      "objectifs": "Signer 10 contrats",
+      "entreprise": 1,
+      "centre": 1,
+      "date_debut": "2025-06-03",
+      "date_fin": null,
+      "created_at": "2025-06-03T09:00:00Z"
+    }
+  },
+  {
+    "model": "missions.ressource",
+    "pk": 1,
+    "fields": {
+      "mission": 1,
+      "nom": "Script d'appel",
+      "fichier": "",
+      "type": "document",
+      "description": "Script pour les agents"
+    }
+  },
+  {
+    "model": "formations.formation",
+    "pk": 1,
+    "fields": {
+      "titre": "Formation Python",
+      "centre": 1,
+      "mission": 1,
+      "date": "2025-06-01",
+      "description": "Initiation à Python pour débutants."
+    }
+  },
+  {
+    "model": "formations.quiz",
+    "pk": 1,
+    "fields": {
+      "formation": 1,
+      "question": "Qu'est-ce qu'une variable en Python ?",
+      "reponse": "Un espace pour stocker une valeur."
+    }
+  },
+  {
+    "model": "formations.participation",
+    "pk": 1,
+    "fields": {
+      "formation": 1,
+      "agent": 1,
+      "date": "2025-06-04T10:00:00Z",
+      "score": 18.5
+    }
+  },
+  {
+    "model": "formations.inscriptionformation",
+    "pk": 1,
+    "fields": {
+      "nom_prenom": "Jean Dupont",
+      "email": "jean.dupont@example.com",
+      "telephone": "0600000000",
+      "date_naissance": "1990-01-01",
+      "budget": "1200.00",
+      "num_edof": "EDOF1234",
+      "formation": "Formation Python",
+      "adresse_postale": "123 rue de Paris, 75000 Paris",
+      "date_saisie": "2025-06-04T10:05:00Z"
+    }
+  }
+]

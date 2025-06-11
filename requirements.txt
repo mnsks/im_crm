@@ -1,0 +1,17 @@
+django
+mysqlclient
+django-widget-tweaks
+djangorestframework
+
+# AI Dependencies
+scikit-learn
+tensorflow
+transformers
+ortools
+pandas
+numpy
+textblob
+celery
+redis
+django-celery-beat
+django-celery-results

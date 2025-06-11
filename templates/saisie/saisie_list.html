@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Saisie des Résultats{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Saisie des Résultats</h1>
+        <a href="{% url 'saisie:saisie_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nouvelle Saisie
+        </a>
+    </div>
+
+    {% if messages %}
+    <div class="messages mb-4">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Filtres -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="mission" class="form-label">Mission</label>
+                    <select name="mission" id="mission" class="form-select">
+                        <option value="">Toutes les missions</option>
+                        {% for mission in missions %}
+                        <option value="{{ mission.id }}" {% if request.GET.mission == mission.id|stringformat:"s" %}selected{% endif %}>
+                            {{ mission }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="agent" class="form-label">Agent</label>
+                    <select name="agent" id="agent" class="form-select">
+                        <option value="">Tous les agents</option>
+                        {% for agent in agents %}
+                        <option value="{{ agent.id }}" {% if request.GET.agent == agent.id|stringformat:"s" %}selected{% endif %}>
+                            {{ agent }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="status" class="form-label">Statut</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="">Tous les statuts</option>
+                        {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="date" class="form-label">Date</label>
+                    <input type="date" name="date" id="date" class="form-control"
+                           value="{{ request.GET.date }}">
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter"></i> Filtrer
+                    </button>
+                    <a href="{% url 'saisie:saisie_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Réinitialiser
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tableau des résultats -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="saisie-table" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Mission</th>
+                            <th>Agent</th>
+                            <th>Client</th>
+                            <th>Statut</th>
+                            <th>Durée</th>
+                            <th>Rappel</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for saisie in saisies %}
+                        <tr>
+                            <td>{{ saisie.date_appel|date:"d/m/Y H:i" }}</td>
+                            <td>{{ saisie.mission }}</td>
+                            <td>{{ saisie.agent }}</td>
+                            <td>{{ saisie.client }}</td>
+                            <td>
+                                <span class="badge bg-{{ saisie.status|yesno:'success,warning' }}">
+                                    {{ saisie.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ saisie.duree_appel }}</td>
+                            <td>
+                                {% if saisie.rappel_prevu %}
+                                <span class="badge bg-info">
+                                    {{ saisie.rappel_prevu|date:"d/m/Y H:i" }}
+                                </span>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'saisie:saisie_detail' saisie.pk %}" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'saisie:saisie_update' saisie.pk %}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialiser DataTables
+        $('#saisie-table').DataTable({
+            language: {
+                url: "{% static 'js/datatables-fr.json' %}"
+            },
+            pageLength: 25,
+            order: [[0, 'desc']], // Trier par date décroissante
+            columnDefs: [{
+                targets: -1, // Colonne Actions
+                orderable: false
+            }]
+        });
+
+        // Mettre à jour la liste des agents selon la mission sélectionnée
+        $('#mission').change(function() {
+            var missionId = $(this).val();
+            if (missionId) {
+                $.get('/api/missions/' + missionId + '/agents/', function(data) {
+                    var options = '<option value="">Tous les agents</option>';
+                    data.forEach(function(agent) {
+                        options += '<option value="' + agent.id + '">' + agent.name + '</option>';
+                    });
+                    $('#agent').html(options);
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

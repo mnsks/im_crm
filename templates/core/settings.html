@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-cog"></i> Paramètres
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <h6 class="mb-3">Préférences de notification</h6>
+                        <div class="mb-4">
+                            <div class="form-check form-switch mb-2">
+                                <input type="checkbox" class="form-check-input" id="email_notifications" name="email_notifications" {% if user.settings.email_notifications %}checked{% endif %}>
+                                <label class="form-check-label" for="email_notifications">
+                                    Recevoir les notifications par email
+                                </label>
+                            </div>
+                            
+                            <div class="form-check form-switch mb-2">
+                                <input type="checkbox" class="form-check-input" id="browser_notifications" name="browser_notifications" {% if user.settings.browser_notifications %}checked{% endif %}>
+                                <label class="form-check-label" for="browser_notifications">
+                                    Activer les notifications du navigateur
+                                </label>
+                            </div>
+                        </div>
+
+                        <h6 class="mb-3">Affichage</h6>
+                        <div class="mb-4">
+                            <div class="form-check form-switch mb-2">
+                                <input type="checkbox" class="form-check-input" id="dark_mode" name="dark_mode" {% if user.settings.dark_mode %}checked{% endif %}>
+                                <label class="form-check-label" for="dark_mode">
+                                    Mode sombre
+                                </label>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="items_per_page" class="form-label">Éléments par page</label>
+                                <select class="form-select" id="items_per_page" name="items_per_page">
+                                    <option value="10" {% if user.settings.items_per_page == 10 %}selected{% endif %}>10</option>
+                                    <option value="25" {% if user.settings.items_per_page == 25 %}selected{% endif %}>25</option>
+                                    <option value="50" {% if user.settings.items_per_page == 50 %}selected{% endif %}>50</option>
+                                    <option value="100" {% if user.settings.items_per_page == 100 %}selected{% endif %}>100</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <h6 class="mb-3">Sécurité</h6>
+                        <div class="mb-4">
+                            <div class="form-check form-switch mb-2">
+                                <input type="checkbox" class="form-check-input" id="two_factor_auth" name="two_factor_auth" {% if user.settings.two_factor_auth %}checked{% endif %}>
+                                <label class="form-check-label" for="two_factor_auth">
+                                    Authentification à deux facteurs
+                                </label>
+                            </div>
+
+                            <div class="form-check form-switch mb-2">
+                                <input type="checkbox" class="form-check-input" id="session_timeout" name="session_timeout" {% if user.settings.session_timeout %}checked{% endif %}>
+                                <label class="form-check-label" for="session_timeout">
+                                    Déconnexion automatique après inactivité
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer les modifications
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-switch .form-check-input {
+    width: 3em;
+}
+
+.form-check-input:checked {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+</style>
+{% endblock %}

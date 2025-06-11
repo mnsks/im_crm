@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Recommandations de Formation</h1>
+    
+    {% if recommendations %}
+        <div class="recommendations-list">
+            {% for recommendation in recommendations %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ recommendation.formation.titre }}</h5>
+                        <p class="card-text">{{ recommendation.formation.description }}</p>
+                        
+                        <h6>Score: {{ recommendation.score|floatformat:2 }}</h6>
+                        
+                        {% if recommendation.explications %}
+                            <div class="explanations mt-3">
+                                <h6>Pourquoi cette recommandation ?</h6>
+                                <ul class="list-unstyled">
+                                    {% for explication in recommendation.explications %}
+                                        <li><i class="fas fa-info-circle"></i> {{ explication.raison }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="mt-3">
+                            <a href="{% url 'formations:detail' recommendation.formation.id %}" class="btn btn-primary">
+                                Voir la formation
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Aucune recommandation disponible pour le moment.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

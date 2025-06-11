@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Rapport journalier - {{ date|date:"d/m/Y" }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Rapport journalier du {{ date|date:"d/m/Y" }}</h1>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Statistiques globales</h5>
+                    <p class="card-text">Total des appels : {{ statistiques.total_appels }}</p>
+                    <p class="card-text">Taux de succès : {{ statistiques.taux_succes }}%</p>
+                    <p class="card-text">Durée moyenne : {{ statistiques.duree_moyenne|default:"0" }} minutes</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Détail des appels</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="text-success">Succès : {{ statistiques.succes }}</p>
+                            <p class="text-danger">Échecs : {{ statistiques.echecs }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="text-warning">Rappels : {{ statistiques.rappels }}</p>
+                            <p class="text-muted">Indisponibles : {{ statistiques.indisponibles }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Liste des appels du jour</h5>
+            {% if saisies %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Heure</th>
+                            <th>Client</th>
+                            <th>Mission</th>
+                            <th>Statut</th>
+                            <th>Durée</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for saisie in saisies %}
+                        <tr>
+                            <td>{{ saisie.date_appel|date:"H:i" }}</td>
+                            <td>{{ saisie.client }}</td>
+                            <td>{{ saisie.mission }}</td>
+                            <td>
+                                {% if saisie.status == 'success' %}
+                                <span class="badge bg-success">Succès</span>
+                                {% elif saisie.status == 'failure' %}
+                                <span class="badge bg-danger">Échec</span>
+                                {% elif saisie.status == 'callback' %}
+                                <span class="badge bg-warning">Rappel</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Indisponible</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ saisie.duree_appel }} min</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">Aucun appel enregistré aujourd'hui.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if user.role == 'agent' %}
+        Mon Planning
+    {% else %}
+        Liste des Missions
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header pt-4">
+                    <h4 class="card-title">
+                        {% if user.role == 'agent' %}
+                            Mon Planning
+                        {% else %}
+                            Liste des Missions
+                        {% endif %}
+                    </h4>
+                    {% if user.role in 'entreprise,centre,admin' %}
+                        <a href="{% url 'missions:mission_create' %}" class="btn btn-primary float-right">
+                            <i class="fas fa-plus"></i> Nouvelle Mission
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <!-- Filtres -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <form method="get" class="d-flex flex-wrap gap-3 align-items-end">
+                                <div class="flex-grow-1" style="min-width: 200px; max-width: 250px;">
+                                    <label for="status" class="form-label">Statut</label>
+                                    <select name="status" id="status" class="form-select">
+                                        <option value="">Tous</option>
+                                        {% for status, label in status_choices %}
+                                        <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="flex-grow-1" style="min-width: 200px; max-width: 300px;">
+                                    <label for="filter_type" class="form-label">Type de filtre</label>
+                                    <select name="filter_type" id="filter_type" class="form-select">
+                                        <option value="overlap" {% if request.GET.filter_type == 'overlap' %}selected{% endif %}>Missions qui chevauchent la période</option>
+                                        <option value="start" {% if request.GET.filter_type == 'start' %}selected{% endif %}>Missions qui commencent dans la période</option>
+                                        <option value="end" {% if request.GET.filter_type == 'end' %}selected{% endif %}>Missions qui se terminent dans la période</option>
+                                    </select>
+                                </div>
+
+                                <div class="flex-grow-1" style="min-width: 150px; max-width: 200px;">
+                                    <label for="date_debut" class="form-label">Date début</label>
+                                    <input type="date" name="date_debut" id="date_debut" class="form-control" value="{{ request.GET.date_debut }}">
+                                </div>
+
+                                <div class="flex-grow-1" style="min-width: 150px; max-width: 200px;">
+                                    <label for="date_fin" class="form-label">Date fin</label>
+                                    <input type="date" name="date_fin" id="date_fin" class="form-control" value="{{ request.GET.date_fin }}">
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-filter"></i> Filtrer
+                                    </button>
+                                    <a href="{% url 'missions:mission_list' %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times"></i> Réinitialiser
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Liste des missions -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Titre</th>
+                                    <th>Client</th>
+                                    <th>Date début</th>
+                                    <th>Date fin</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for mission in missions %}
+                                    <tr>
+                                        <td>{{ mission.titre }}</td>
+                                        <td>{{ mission.client.nom }}</td>
+                                        <td>{{ mission.date_debut|date:"d/m/Y" }}</td>
+                                        <td>{{ mission.date_fin|date:"d/m/Y" }}</td>
+                                        <td>
+                                            <span class="badge badge-{{ mission.get_status_color }}">
+                                                {{ mission.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'missions:mission_detail' mission.pk %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i> Détails
+                                            </a>
+                                            {% if user.role in 'entreprise,centre,admin' %}
+                                                <a href="{% url 'missions:mission_update' mission.pk %}" class="btn btn-sm btn-warning">
+                                                    <i class="fas fa-edit"></i> Modifier
+                                                </a>
+                                                <a href="{% url 'missions:mission_delete' mission.pk %}" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-trash"></i> Supprimer
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center">
+                                            {% if user.role == 'agent' %}
+                                                Aucune mission planifiée.
+                                            {% else %}
+                                                Aucune mission trouvée.
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if missions.has_other_pages %}
+                        <nav aria-label="Page navigation" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                {% if missions.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ missions.previous_page_number }}" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+
+                                {% for num in missions.paginator.page_range %}
+                                    <li class="page-item {% if missions.number == num %}active{% endif %}">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endfor %}
+
+                                {% if missions.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ missions.next_page_number }}" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

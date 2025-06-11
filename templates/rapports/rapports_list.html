@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rapports{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Rapports</h1>
+    </div>
+
+    <!-- Filtres -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="date_debut" class="form-label">Date début</label>
+                    <input type="date" name="date_debut" id="date_debut" class="form-control"
+                           value="{{ date_debut }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="date_fin" class="form-label">Date fin</label>
+                    <input type="date" name="date_fin" id="date_fin" class="form-control"
+                           value="{{ date_fin }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="mission" class="form-label">Mission</label>
+                    <select name="mission" id="mission" class="form-select">
+                        <option value="">Toutes les missions</option>
+                        {% for mission in missions %}
+                        <option value="{{ mission.id }}" {% if mission_id == mission.id|stringformat:"s" %}selected{% endif %}>
+                            {{ mission }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-filter"></i> Filtrer
+                    </button>
+                    <a href="{% url 'rapports:rapports_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Réinitialiser
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Appels</h5>
+                    <p class="card-text display-6">{{ statistiques.total_appels }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Taux de Succès</h5>
+                    <p class="card-text display-6">{{ statistiques.taux_succes }}%</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Durée Moyenne</h5>
+                    <p class="card-text display-6">{{ statistiques.duree_moyenne|default:"0" }} min</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Rappels</h5>
+                    <p class="card-text display-6">{{ statistiques.rappels }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Détails -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="rapports-table" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Mission</th>
+                            <th>Agent</th>
+                            <th>Client</th>
+                            <th>Statut</th>
+                            <th>Durée</th>
+                            <th>Rappel</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for saisie in saisies %}
+                        <tr>
+                            <td>{{ saisie.date_appel|date:"d/m/Y H:i" }}</td>
+                            <td>{{ saisie.mission }}</td>
+                            <td>{{ saisie.agent }}</td>
+                            <td>{{ saisie.client }}</td>
+                            <td>
+                                <span class="badge bg-{{ saisie.status|yesno:'success,warning' }}">
+                                    {{ saisie.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ saisie.duree_appel }}</td>
+                            <td>
+                                {% if saisie.rappel_prevu %}
+                                <span class="badge bg-info">
+                                    {{ saisie.rappel_prevu|date:"d/m/Y H:i" }}
+                                </span>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialiser DataTables
+        $('#rapports-table').DataTable({
+            language: {
+                url: "{% static 'js/datatables-fr.json' %}"
+            },
+            pageLength: 25,
+            order: [[0, 'desc']], // Trier par date décroissante
+            columnDefs: [{
+                targets: [4, 6], // Colonnes Statut et Rappel
+                orderable: false
+            }]
+        });
+    });
+</script>
+{% endblock %}

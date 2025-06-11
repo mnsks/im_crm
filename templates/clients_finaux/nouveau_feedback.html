@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Nouveau Feedback{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'clients_finaux:feedback' %}">Feedbacks</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Nouveau Feedback</li>
+        </ol>
+    </nav>
+
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title mb-4">Donner un Feedback</h2>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group mb-3">
+                    <label for="mission">Mission</label>
+                    <select name="mission_id" id="mission" class="form-control" required>
+                        <option value="">Sélectionnez une mission</option>
+                        {% for mission in missions %}
+                            <option value="{{ mission.id }}">
+                                {{ mission.titre }} - 
+                                {% if mission.agent %}
+                                    Agent: {{ mission.agent.get_full_name|default:mission.agent.username }}
+                                {% else %}
+                                    (Pas d'agent assigné)
+                                {% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <small class="form-text text-muted">
+                        Sélectionnez la mission pour laquelle vous souhaitez donner un feedback.
+                        Le feedback sera envoyé à l'agent qui a géré cette mission.
+                    </small>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Note</label>
+                    <div class="btn-group d-flex" role="group">
+                        {% for value, label in rating_choices %}
+                            <input type="radio" class="btn-check" name="note" id="note{{ value }}" value="{{ value }}" required>
+                            <label class="btn btn-outline-primary" for="note{{ value }}">
+                                {{ value }}
+                                <br>
+                                <small>{{ label }}</small>
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="commentaire">Commentaire</label>
+                    <textarea name="commentaire" id="commentaire" class="form-control" rows="4" required></textarea>
+                </div>
+
+                <div class="text-end">
+                    <a href="{% url 'clients_finaux:feedback' %}" class="btn btn-secondary me-2">Annuler</a>
+                    <button type="submit" class="btn btn-primary">Envoyer le Feedback</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

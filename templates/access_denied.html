@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Accès refusé{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card mt-5 shadow-sm border-danger">
+            <div class="card-body text-center">
+                <i class="fas fa-ban fa-3x text-danger mb-3"></i>
+                <h2 class="mb-3 text-danger">Accès refusé</h2>
+                <p class="lead">Vous n'avez pas le droit d'effectuer cette action.<br>
+                Si vous pensez qu'il s'agit d'une erreur, contactez votre administrateur.</p>
+                <a href="/" class="btn btn-outline-primary mt-3">Retour à l'accueil</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

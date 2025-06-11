@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Prédictions de Performance{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4">Prédictions de Performance</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-success">Historique des prédictions</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Agent</th>
+                            <th>KPI Prédit</th>
+                            <th>Confiance</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for prediction in predictions %}
+                        <tr>
+                            <td>{{ prediction.date_prediction|date:"d/m/Y H:i" }}</td>
+                            <td>{{ prediction.agent.user.username }}</td>
+                            <td>{{ prediction.kpi_predit|floatformat:2 }}</td>
+                            <td>{{ prediction.confiance|floatformat:2 }}%</td>
+                            <td>
+                                {% if prediction.alerte %}
+                                <span class="badge badge-danger">Alerte</span>
+                                {% else %}
+                                <span class="badge badge-success">Normal</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">Aucune prédiction disponible</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if is_paginated %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédent</a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Graphique des tendances -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-success">Tendances de Performance</h6>
+        </div>
+        <div class="card-body">
+            <div class="chart-area">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    $(document).ready(function() {
+        // DataTable
+        $('#dataTable').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/French.json"
+            }
+        });
+
+        // Chart.js
+        var ctx = document.getElementById('performanceChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [{% for prediction in predictions %}'{{ prediction.date_prediction|date:"d/m" }}',{% endfor %}],
+                datasets: [{
+                    label: 'KPI Prédit',
+                    data: [{% for prediction in predictions %}{{ prediction.kpi_predit }},{% endfor %}],
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    });
+</script>
+{% endblock %}

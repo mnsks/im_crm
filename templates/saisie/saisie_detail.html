@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Détails de la Saisie{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="card-title mb-0">Détails de l'Appel</h2>
+                        <div class="btn-group">
+                            <a href="{% url 'saisie:saisie_update' saisie.pk %}" class="btn btn-warning">
+                                <i class="fas fa-edit"></i> Modifier
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Informations de l'appel</h5>
+                            <dl class="row">
+                                <dt class="col-sm-4">Mission</dt>
+                                <dd class="col-sm-8">{{ saisie.mission }}</dd>
+
+                                <dt class="col-sm-4">Agent</dt>
+                                <dd class="col-sm-8">{{ saisie.agent }}</dd>
+
+                                <dt class="col-sm-4">Client</dt>
+                                <dd class="col-sm-8">
+                                    <a href="{% url 'clients:client_detail' saisie.client.pk %}">
+                                        {{ saisie.client }}
+                                    </a>
+                                </dd>
+
+                                <dt class="col-sm-4">Date</dt>
+                                <dd class="col-sm-8">{{ saisie.date_appel|date:"d/m/Y H:i" }}</dd>
+
+                                <dt class="col-sm-4">Durée</dt>
+                                <dd class="col-sm-8">{{ saisie.duree_appel }}</dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Statut</h5>
+                            <div class="text-center mb-3">
+                                <span class="badge bg-{{ saisie.status|yesno:'success,warning' }} p-2">
+                                    <i class="fas fa-{{ saisie.status|yesno:'check,phone' }} me-1"></i>
+                                    {{ saisie.get_status_display }}
+                                </span>
+                                {% if saisie.rappel_prevu %}
+                                <div class="mt-3">
+                                    <h6>Rappel prévu</h6>
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-calendar-alt me-2"></i>
+                                        {{ saisie.rappel_prevu|date:"d/m/Y H:i" }}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if saisie.commentaire %}
+                    <div class="mt-4">
+                        <h5>Commentaire</h5>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                {{ saisie.commentaire|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'saisie:saisie_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Retour à la liste
+                        </a>
+                        {% if saisie.status == 'callback' and saisie.rappel_prevu and saisie.rappel_prevu > now %}
+                        <a href="{% url 'saisie:saisie_create' %}?client={{ saisie.client.pk }}&mission={{ saisie.mission.pk }}"
+                           class="btn btn-primary">
+                            <i class="fas fa-phone"></i> Nouvel Appel
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historique des appels pour ce client -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Historique des appels pour {{ saisie.client }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Agent</th>
+                                    <th>Statut</th>
+                                    <th>Durée</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appel in saisie.client.interactions_saisie.all|dictsortreversed:"date_appel" %}
+                                {% if appel != saisie %}
+                                <tr>
+                                    <td>{{ appel.date_appel|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ appel.agent }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ appel.status|yesno:'success,warning' }}">
+                                            {{ appel.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ appel.duree_appel }}</td>
+                                    <td>
+                                        <a href="{% url 'saisie:saisie_detail' appel.pk %}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">Aucun autre appel trouvé.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialiser DataTables pour l'historique des appels
+        $('.table').DataTable({
+            language: {
+                url: "{% static 'js/datatables-fr.json' %}"
+            },
+            pageLength: 5,
+            order: [[0, 'desc']]
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Optimisation des Plannings</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" class="form-inline">
+                        {% csrf_token %}
+                        <div class="form-group mx-sm-3 mb-2">
+                            <label for="date_debut" class="mr-2">Date début</label>
+                            <input type="date" class="form-control" id="date_debut" name="date_debut" required>
+                        </div>
+                        <div class="form-group mx-sm-3 mb-2">
+                            <label for="date_fin" class="mr-2">Date fin</label>
+                            <input type="date" class="form-control" id="date_fin" name="date_fin" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary mb-2">Optimiser</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if planning %}
+        <div class="planning-container">
+            <h2>Planning Optimisé</h2>
+            
+            <div class="stats-row row mb-4">
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Score d'Optimisation</h5>
+                            <div class="metric-value">{{ planning.score|floatformat:2 }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Couverture</h5>
+                            <div class="metric-value">{{ planning.couverture|floatformat:2 }}%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Équilibre Charge</h5>
+                            <div class="metric-value">{{ planning.equilibre|floatformat:2 }}%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Satisfaction Contraintes</h5>
+                            <div class="metric-value">{{ planning.satisfaction|floatformat:2 }}%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Agent</th>
+                            {% for date in planning.dates %}
+                                <th>{{ date|date:"d/m" }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for agent in planning.agents %}
+                            <tr>
+                                <td>{{ agent.nom }}</td>
+                                {% for creneau in agent.creneaux %}
+                                    <td class="{% if creneau.type == 'matin' %}bg-primary text-white{% elif creneau.type == 'aprem' %}bg-success text-white{% elif creneau.type == 'repos' %}bg-light{% endif %}">
+                                        {{ creneau.type|title }}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-4">
+                <button class="btn btn-success">Valider le planning</button>
+                <button class="btn btn-secondary">Exporter en PDF</button>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mt-3">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<style>
+.metric-value {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 1rem;
+}
+.table td {
+    text-align: center;
+}
+</style>
+{% endblock %}

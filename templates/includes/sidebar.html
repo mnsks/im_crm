@@ -1,0 +1,291 @@
+{% load static %}
+
+<nav class="sidebar" id="mainSidebar">
+    <div class="sidebar-header">
+        <a href="{% url 'core:dashboard' %}" class="logo-link">
+            <img src="{% static 'img/logo.png' %}" alt="Logo" class="sidebar-logo">
+        </a>
+    </div>
+{% if user.is_authenticated %}
+    <div class="nav-section">
+        <div class="nav-section-title">Aide</div>
+        <div class="nav-item">
+            <a href="{% url 'guide_utilisateur' %}" class="nav-link">
+                <i class="fas fa-question-circle"></i>Guide utilisateur
+            </a>
+        </div>
+    </div>
+    {% if user.role == 'agent' %}
+        <!-- Menu Agent -->
+        <div class="nav-section">
+            <div class="nav-section-title">Planning & Missions</div>
+            <div class="nav-item">
+                <a href="{% url 'core:dashboard' %}" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i>Tableau de bord
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'missions:mission_list' %}" class="nav-link">
+                    <i class="fas fa-calendar"></i>Planning
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'saisie:saisie_list' %}" class="nav-link">
+                    <i class="fas fa-keyboard"></i>Saisie résultats
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Clients & Scripts</div>
+            <div class="nav-item">
+                <a href="{% url 'clients:client_list' %}" class="nav-link">
+                    <i class="fas fa-users"></i>Clients
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'scripts:script_list' %}" class="nav-link">
+                    <i class="fas fa-file-alt"></i>Scripts
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Formation & Rapports</div>
+            <div class="nav-item">
+                <a href="{% url 'formations:formation_list' %}" class="nav-link">
+                    <i class="fas fa-graduation-cap"></i>Formations
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'rapports:daily_report' %}" class="nav-link">
+                    <i class="fas fa-chart-line"></i>Rapport journalier
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Outils IA</div>
+            <div class="nav-item">
+                <a href="{% url 'ai_tools:recommendations' %}" class="nav-link">
+                    <i class="fas fa-robot"></i>Recommandations
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'ai_tools:performance_prediction' %}" class="nav-link">
+                    <i class="fas fa-chart-bar"></i>Prévisions
+                </a>
+            </div>
+        </div>
+    {% elif user.role == 'centre' %}
+        <!-- Menu Centre d'Appel -->
+        <div class="nav-section">
+            <div class="nav-section-title">Tableau de bord</div>
+            <div class="nav-item">
+                <a href="{% url 'core:dashboard' %}" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i>Vue générale
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Gestion Opérationnelle</div>
+            <div class="nav-item">
+                <a href="{% url 'missions:mission_list' %}" class="nav-link">
+                    <i class="fas fa-tasks"></i>Missions
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'saisie:saisie_list' %}" class="nav-link">
+                    <i class="fas fa-keyboard"></i>Saisie
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'agents:agent_list' %}" class="nav-link">
+                    <i class="fas fa-users"></i>Agents
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Suivi & Rapports</div>
+            <div class="nav-item">
+                <a href="{% url 'clients:client_list' %}" class="nav-link">
+                    <i class="fas fa-address-book"></i>Clients
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'rapports:rapports_list' %}" class="nav-link">
+                    <i class="fas fa-file-alt"></i>Rapports
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'formations:formation_list' %}" class="nav-link">
+                    <i class="fas fa-graduation-cap"></i>Formations
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'communication:communication_list' %}" class="nav-link">
+                    <i class="fas fa-comments"></i>Communication
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Outils IA</div>
+            <div class="nav-item">
+                <a href="{% url 'ai_tools:team_performance' %}" class="nav-link">
+                    <i class="fas fa-users-cog"></i>Performance Équipe
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'ai_tools:schedule_optimization' %}" class="nav-link">
+                    <i class="fas fa-calendar-alt"></i>Optimisation
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'ai_tools:sentiment_analysis' %}" class="nav-link">
+                    <i class="fas fa-heart"></i>Satisfaction
+                </a>
+            </div>
+        </div>
+
+    {% elif user.role == 'admin' %}
+        <!-- Menu Administrateur -->
+        <div class="nav-section">
+            <div class="nav-section-title">Tableau de bord</div>
+            <div class="nav-item">
+                <a href="{% url 'core:dashboard' %}" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i>Vue générale
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Administration</div>
+            <div class="nav-item">
+                <a href="{% url 'missions:mission_list' %}" class="nav-link">
+                    <i class="fas fa-tasks"></i>Missions
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'agents:agent_list' %}" class="nav-link">
+                    <i class="fas fa-user-tie"></i>Gestion Agents
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'kpis:list' %}" class="nav-link">
+                    <i class="fas fa-chart-pie"></i>KPIs
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'formations:formation_list' %}" class="nav-link">
+                    <i class="fas fa-graduation-cap"></i>Formations
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Outils IA</div>
+            <div class="nav-item">
+                <a href="{% url 'ai_tools:global_analytics' %}" class="nav-link">
+                    <i class="fas fa-brain"></i>Analytics Global
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'ai_tools:predictive_alerts' %}" class="nav-link">
+                    <i class="fas fa-bell"></i>Alertes
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'ai_tools:training_analytics' %}" class="nav-link">
+                    <i class="fas fa-graduation-cap"></i>Analytics Formation
+                </a>
+            </div>
+        </div>
+
+    {% elif user.role == 'donneur_ordre' %}
+        <!-- Menu Donneur d'Ordre -->
+        <div class="nav-section">
+            <div class="nav-section-title">Tableau de bord</div>
+            <div class="nav-item">
+                <a href="{% url 'core:dashboard' %}" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i>Vue générale
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Gestion</div>
+            <div class="nav-item">
+                <a href="{% url 'missions:mission_list' %}" class="nav-link">
+                    <i class="fas fa-tasks"></i>Missions
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'documents:document_list' %}" class="nav-link">
+                    <i class="fas fa-folder"></i>Documents
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Communication</div>
+            <div class="nav-item">
+                <a href="{% url 'feedback:feedback_list' %}" class="nav-link">
+                    <i class="fas fa-comments"></i>Feedbacks
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'communication:communication_list' %}" class="nav-link">
+                    <i class="fas fa-envelope"></i>Messagerie
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Outils IA</div>
+            <div class="nav-item">
+                <a href="{% url 'ai_tools:global_analytics' %}" class="nav-link">
+                    <i class="fas fa-chart-line"></i>Performance
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'ai_tools:sentiment_analysis' %}" class="nav-link">
+                    <i class="fas fa-heart"></i>Satisfaction
+                </a>
+            </div>
+        </div>
+
+    {% elif user.role == 'client' %}
+        <!-- Menu Client Final -->
+        <div class="nav-section">
+            <div class="nav-section-title">Suivi</div>
+            <div class="nav-item">
+                <a href="{% url 'clients_finaux:historique' %}" class="nav-link">
+                    <i class="fas fa-history"></i>Historique
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'clients_finaux:requetes' %}" class="nav-link">
+                    <i class="fas fa-tasks"></i>Requêtes
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Documents & Feedback</div>
+            <div class="nav-item">
+                <a href="{% url 'clients_finaux:documents' %}" class="nav-link">
+                    <i class="fas fa-folder"></i>Documents
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="{% url 'clients_finaux:feedback' %}" class="nav-link">
+                    <i class="fas fa-star"></i>Feedback
+                </a>
+            </div>
+        </div>
+    {% endif %}
+{% endif %}
+</nav>

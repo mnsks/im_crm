@@ -1,0 +1,390 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord Agent{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2 class="mb-3">
+                <i class="fas fa-user text-primary"></i> 
+                Bienvenue, {{ user.get_full_name|default:user.username }}
+            </h2>
+            <p class="text-muted">{{ centre.nom }} - Votre espace personnel</p>
+        </div>
+    </div>
+
+    <!-- Cartes statistiques -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-phone-alt text-primary"></i> Appels</h5>
+                    <p class="display-5">{{ appels_aujourdhui|default:0 }}</p>
+                    <p class="text-muted small">Appels aujourd'hui</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-chart-line text-success"></i> Performance</h5>
+                    <p class="display-5">{{ taux_succes|floatformat:1 }}%</p>
+                    <p class="text-muted small">Taux de réussite</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-clock text-info"></i> Temps moyen</h5>
+                    <p class="display-5">{{ duree_moyenne_minutes|floatformat:1 }} min</p>
+                    <p class="text-muted small">Par appel</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-graduation-cap text-warning"></i> Formations</h5>
+                    <p class="display-5">{{ nb_formations_suivies|default:0 }}</p>
+                    <p class="text-muted small">Formations complétées</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Planning et Performance -->
+    <div class="row mt-4">
+        <!-- Planning du jour -->
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-calendar-day text-primary"></i> 
+                        Planning du jour
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        {% for event in planning_jour %}
+                        <div class="timeline-item">
+                            <div class="timeline-time">{{ event.time }}</div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">{{ event.title }}</h6>
+                                <p class="mb-0 small text-muted">{{ event.description }}</p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-center text-muted">Aucun événement prévu</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Performance journalière -->
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-line text-success"></i> 
+                        Performance journalière
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="dailyPerformanceChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Missions et Formations -->
+    <div class="row mt-4">
+        <!-- Mission en cours -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-tasks text-info"></i> 
+                        Mission en cours
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if current_mission %}
+                    <div class="mission-details">
+                        <h6 class="mb-3">{{ current_mission.titre }}</h6>
+                        <p class="text-muted mb-3">{{ current_mission.description }}</p>
+                        <div class="progress mb-3" style="height: 8px;">
+                            <div class="progress-bar" role="progressbar" style="width: {{ current_mission.progression }}%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-primary">{{ current_mission.get_status_display }}</span>
+                            <small class="text-muted">Échéance : {{ current_mission.deadline }}</small>
+                        </div>
+                        <div class="mt-3">
+                            <h6 class="mb-2">Objectifs :</h6>
+                            <ul class="list-unstyled">
+                                {% for objectif in current_mission.objectifs %}
+                                <li>
+                                    <i class="fas {% if objectif.completed %}fa-check-circle text-success{% else %}fa-circle text-muted{% endif %} me-2"></i>
+                                    {{ objectif.description }}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-3">
+                        <p class="text-muted">Aucune mission en cours</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Formations à venir -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-graduation-cap text-warning"></i> 
+                        Formations à venir
+                    </h5>
+                    <a href="{% url 'formations:formation_list' %}" class="btn btn-sm btn-outline-primary">
+                        Voir toutes les formations
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for formation in formations_a_venir %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ formation.titre }}</h6>
+                                <small class="text-primary">{{ formation.date }}</small>
+                            </div>
+                            <p class="mb-1">{{ formation.description|truncatechars:100 }}</p>
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i> {{ formation.duree }}
+                                <i class="fas fa-users ms-3 me-1"></i> {{ formation.nb_participants }} participants
+                            </small>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-3">
+                            <p class="text-muted">Aucune formation planifiée</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Timeline Styles */
+.timeline {
+    position: relative;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: -20px;
+    width: 2px;
+    background: #e9ecef;
+    z-index: 1;
+}
+
+.timeline-item:last-child::before {
+    bottom: 0;
+}
+
+.timeline-item::after {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #00BFFF;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 4px rgba(0, 191, 255, 0.1);
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.timeline-item:hover::after {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 6px rgba(0, 191, 255, 0.1);
+}
+
+.timeline-time {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+}
+
+.timeline-content {
+    padding-bottom: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+.timeline-item:hover .timeline-content {
+    transform: translateX(5px);
+}
+
+/* Style pour les cartes de statistiques */
+.stat-card {
+    border-radius: 0.5rem;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Style pour les graphiques */
+.chart-container {
+    position: relative;
+    margin: 0 auto;
+    height: 300px;
+    width: 100%;
+}
+
+/* Style pour les cartes de mission */
+.mission-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mission-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Graphique de performance journalière
+    const performanceCtx = document.getElementById('dailyPerformanceChart');
+    if (performanceCtx) {
+        const ctx = performanceCtx.getContext('2d');
+        
+        // Données par défaut si les variables ne sont pas définies
+        let labels = [];
+        let callsData = [];
+        let successRate = [];
+        
+        try {
+            labels = JSON.parse('{{ dates|default:"[]"|escapejs }}') || [];
+            callsData = JSON.parse('{{ nb_appels|default:"[]"|escapejs }}') || [];
+            successRate = JSON.parse('{{ durees_moyennes|default:"[]"|escapejs }}') || [];
+            
+            // Si pas de données, on crée des données vides pour 7 jours
+            if (labels.length === 0) {
+                const dates = [];
+                const today = new Date();
+                for (let i = 6; i >= 0; i--) {
+                    const date = new Date(today);
+                    date.setDate(date.getDate() - i);
+                    dates.push(date.toLocaleDateString('fr-FR', {day: '2-digit', month: '2-digit'}));
+                }
+                labels = dates;
+                callsData = Array(7).fill(0);
+                successRate = Array(7).fill(0);
+            }
+        } catch (e) {
+            console.error('Erreur lors du chargement des données du graphique:', e);
+            // Données par défaut en cas d'erreur
+            labels = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+            callsData = [0, 0, 0, 0, 0, 0, 0];
+            successRate = [0, 0, 0, 0, 0, 0, 0];
+        }
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Appels traités',
+                        data: callsData,
+                        borderColor: '#00BFFF',
+                        backgroundColor: '#00BFFF20',
+                        tension: 0.1,
+                        fill: true
+                    },
+                    {
+                        label: 'Taux de réussite',
+                        data: successRate,
+                        borderColor: '#28a745',
+                        backgroundColor: '#28a74520',
+                        tension: 0.1,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 15
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y + (context.datasetIndex === 1 ? '%' : '');
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

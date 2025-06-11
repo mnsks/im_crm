@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Rapport - {{ rapport.mission.titre }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 2cm;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2em;
+        }
+        .header h1 {
+            color: #007bff;
+            margin-bottom: 0.5em;
+        }
+        .section {
+            margin-bottom: 2em;
+        }
+        .section h2 {
+            color: #495057;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 0.5em;
+            margin-bottom: 1em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1em;
+        }
+        th, td {
+            padding: 0.5em;
+            border: 1px solid #dee2e6;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+        }
+        .footer {
+            margin-top: 2em;
+            text-align: center;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1em;
+            margin-bottom: 1em;
+        }
+        .stat-box {
+            padding: 1em;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .stat-label {
+            font-weight: bold;
+            color: #495057;
+        }
+        .stat-value {
+            font-size: 1.2em;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ rapport.mission.titre }}</h1>
+        <p>Rapport du {{ rapport.date|date:"d/m/Y" }}</p>
+        <p>Centre d'appels : {{ rapport.centre.nom }}</p>
+    </div>
+
+    <div class="section">
+        <h2>Statistiques</h2>
+        <div class="stats-grid">
+            {% for indicateur, valeurs in statistiques.items %}
+            <div class="stat-box">
+                <div class="stat-label">{{ indicateur }}</div>
+                <div class="stat-value">
+                    {% if valeurs|length > 1 %}
+                    Moyenne : {{ valeurs|stringformat:".2f" }}
+                    {% else %}
+                    {{ valeurs.0 }}
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Détail des saisies</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Agent</th>
+                    <th>Indicateur</th>
+                    <th>Valeur</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for saisie in saisies %}
+                <tr>
+                    <td>{{ saisie.agent.get_full_name }}</td>
+                    <td>{{ saisie.indicateur }}</td>
+                    <td>{{ saisie.valeur }}</td>
+                    <td>{{ saisie.date|date:"d/m/Y H:i" }}</td>
+                    <td>{{ saisie.get_statut_display }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if feedbacks %}
+    <div class="section">
+        <h2>Feedbacks</h2>
+        {% for feedback in feedbacks %}
+        <div class="feedback">
+            <p><strong>{{ feedback.auteur.get_full_name }}</strong> - {{ feedback.date|date:"d/m/Y H:i" }}</p>
+            <p>{{ feedback.texte }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="footer">
+        <p>Rapport généré le {{ rapport.date_generation|date:"d/m/Y à H:i" }}</p>
+        <p>{{ rapport.entreprise.nom }}</p>
+    </div>
+</body>
+</html>

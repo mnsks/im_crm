@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirmer la Suppression du Feedback - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-3">
+        <div class="col">
+            <h2>Confirmer la Suppression du Feedback</h2>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <p>Êtes-vous sûr de vouloir supprimer le feedback suivant ?</p>
+            <blockquote class="blockquote">
+                <p>{{ feedback.texte }}</p>
+                <footer class="blockquote-footer">Par {{ feedback.auteur.get_full_name|default:feedback.auteur.username }} sur le rapport <cite title="Source Title">{{ feedback.rapport.get_filename }}</cite></footer>
+            </blockquote>
+            
+            <form method="post" action="{% url 'feedback_delete' feedback.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+                <a href="{% url 'missions:mission_detail' feedback.rapport.mission.id %}" class="btn btn-secondary">Non, annuler</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

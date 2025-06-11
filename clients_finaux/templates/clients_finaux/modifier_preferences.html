@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Modifier mes préférences{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-edit"></i> Modifier mes préférences</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="mode_contact_prefere" class="form-label">Mode de contact préféré</label>
+                            <select class="form-select" id="mode_contact_prefere" name="mode_contact_prefere">
+                                <option value="telephone" {% if preferences.mode_contact_prefere == 'telephone' %}selected{% endif %}>Téléphone</option>
+                                <option value="email" {% if preferences.mode_contact_prefere == 'email' %}selected{% endif %}>Email</option>
+                                <option value="sms" {% if preferences.mode_contact_prefere == 'sms' %}selected{% endif %}>SMS</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="horaires_preferes" class="form-label">Horaires préférés</label>
+                            <input type="text" class="form-control" id="horaires_preferes" name="horaires_preferes"
+                                value="{{ preferences.horaires_preferes }}" placeholder="Ex: 9h-12h, 14h-17h">
+                            <div class="form-text">Indiquez vos plages horaires préférées pour être contacté</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="jours_exclus" class="form-label">Jours exclus</label>
+                            <input type="text" class="form-control" id="jours_exclus" name="jours_exclus"
+                                value="{{ preferences.jours_exclus }}" placeholder="Ex: Lundi, Mercredi">
+                            <div class="form-text">Indiquez les jours où vous ne souhaitez pas être contacté</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="numero_telephone" class="form-label">Numéro de téléphone</label>
+                            <input type="tel" class="form-control" id="numero_telephone" name="numero_telephone"
+                                value="{{ preferences.numero_telephone }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email_contact" class="form-label">Email de contact</label>
+                            <input type="email" class="form-control" id="email_contact" name="email_contact"
+                                value="{{ preferences.email_contact }}" required>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ne_pas_deranger" name="ne_pas_deranger"
+                                {% if preferences.ne_pas_deranger %}checked{% endif %}>
+                            <label class="form-check-label" for="ne_pas_deranger">
+                                Ne pas déranger
+                            </label>
+                            <div class="form-text">Activez cette option si vous ne souhaitez pas être contacté temporairement</div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'clients_finaux:preferences' %}" class="btn btn-secondary me-md-2">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">Conseils</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-info-circle text-info"></i>
+                            Pour les horaires, utilisez le format "9h-12h, 14h-17h"
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-info-circle text-info"></i>
+                            Pour les jours exclus, séparez les jours par des virgules
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-info-circle text-info"></i>
+                            Le mode "Ne pas déranger" reste actif jusqu'à ce que vous le désactiviez
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

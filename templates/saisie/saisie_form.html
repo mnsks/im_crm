@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} une Saisie{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title mb-0">{{ action }} une Saisie</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        {% for field in form %}
+                        <div class="form-group mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">
+                                {{ field.label }}
+                                {% if field.field.required %}
+                                <span class="text-danger">*</span>
+                                {% endif %}
+                            </label>
+
+                            {% if field.name == 'status' %}
+                            <div class="btn-group w-100" role="group">
+                                {% for value, label in field.field.choices %}
+                                <input type="radio" class="btn-check" name="{{ field.name }}"
+                                       id="{{ field.id_for_label }}_{{ value }}" value="{{ value }}"
+                                       {% if field.value|stringformat:"s" == value|stringformat:"s" %}checked{% endif %}>
+                                <label class="btn btn-outline-{{ value|yesno:'success,warning' }}"
+                                       for="{{ field.id_for_label }}_{{ value }}">
+                                    {{ label }}
+                                </label>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ field }}
+                            {% endif %}
+
+                            {% if field.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ field.errors|join:", " }}
+                            </div>
+                            {% endif %}
+                            {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'saisie:saisie_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Retour
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-group label {
+        font-weight: 500;
+    }
+    textarea {
+        resize: vertical;
+    }
+    input.form-control, select.form-control, textarea.form-control {
+        background-color: #fff;
+    }
+    .btn-check:checked + .btn-outline-success {
+        color: #fff;
+        background-color: #198754;
+        border-color: #198754;
+    }
+    .btn-check:checked + .btn-outline-warning {
+        color: #000;
+        background-color: #ffc107;
+        border-color: #ffc107;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Ajouter la classe form-control aux champs
+        $('select, textarea, input[type="datetime-local"], input[type="time"]').addClass('form-control');
+
+        // Initialiser les champs datetime-local
+        $('input[type="datetime-local"]').each(function() {
+            if ($(this).val()) {
+                var date = new Date($(this).val());
+                $(this).val(date.toISOString().slice(0, 16));
+            }
+        });
+
+        // Gérer l'affichage conditionnel du champ rappel_prevu
+        function toggleRappelPrevu() {
+            var status = $('input[name="status"]:checked').val();
+            var rappelGroup = $('#id_rappel_prevu').closest('.form-group');
+            if (status === 'callback') {
+                rappelGroup.slideDown();
+            } else {
+                rappelGroup.slideUp();
+                $('#id_rappel_prevu').val('');
+            }
+        }
+
+        // Initialiser l'état du champ rappel_prevu
+        toggleRappelPrevu();
+
+        // Écouter les changements de statut
+        $('input[name="status"]').change(toggleRappelPrevu);
+
+        // Mettre à jour la liste des clients selon la mission sélectionnée
+        $('#id_mission').change(function() {
+            var missionId = $(this).val();
+            if (missionId) {
+                $.get('/api/missions/' + missionId + '/clients/', function(data) {
+                    var options = '<option value="">---------</option>';
+                    data.forEach(function(client) {
+                        options += '<option value="' + client.id + '">' + client.name + '</option>';
+                    });
+                    $('#id_client').html(options);
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

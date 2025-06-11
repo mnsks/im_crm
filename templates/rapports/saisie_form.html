@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Saisie des résultats - {{ mission.titre }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3">
+                <i class="fas fa-clipboard-list text-primary"></i> 
+                Saisie des résultats
+            </h2>
+            <p class="text-muted">Mission : {{ mission.titre }}</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Formulaire de saisie -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Nouveau résultat</h5>
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">
+                                {{ field.label }}
+                            </label>
+                            {{ field }}
+                            {% if field.help_text %}
+                            <div class="form-text">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% if field.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ field.errors|join:", " }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+
+                        <div class="d-flex justify-content-end">
+                            <a href="{% url 'missions:mission_detail' mission.id %}" class="btn btn-outline-secondary me-2">
+                                Retour à la mission
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Enregistrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Saisies récentes -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Vos dernières saisies</h5>
+                    {% if saisies_recentes %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Indicateur</th>
+                                    <th>Valeur</th>
+                                    <th>Date</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for saisie in saisies_recentes %}
+                                <tr>
+                                    <td>{{ saisie.indicateur }}</td>
+                                    <td>{{ saisie.valeur }}</td>
+                                    <td>{{ saisie.date|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ saisie.statut|yesno:'success,danger' }}">
+                                            {{ saisie.get_statut_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">Aucune saisie récente</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

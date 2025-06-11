@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+  <h1>Guide Utilisateur – CRM</h1>
+  <p class="lead">Ce guide vous accompagne dans l'utilisation du CRM selon votre rôle. Utilisez le sommaire pour accéder rapidement à la section souhaitée.</p>
+
+  <nav class="mb-4">
+    <b>Sommaire :</b>
+    <ul class="list-unstyled">
+      <li><a href="#workflow">Workflow complet d'une opération</a></li>
+      <li><a href="#introduction">1. Introduction générale</a></li>
+      <li><a href="#navigation">2. Navigation globale</a></li>
+      <li><a href="#roles">3. Guide par rôle</a>
+        <ul>
+          <li><a href="#admin">Administrateur</a></li>
+          <li><a href="#donneur">Donneur d'Ordre</a></li>
+          <li><a href="#centre">Centre d'Appel</a></li>
+          <li><a href="#agent">Agent</a></li>
+          <li><a href="#client">Client final</a></li>
+        </ul>
+      </li>
+      <li><a href="#transverse">4. Fonctionnalités transverses</a></li>
+      <li><a href="#faq">5. FAQ et dépannage</a></li>
+      <li><a href="#annexes">6. Annexes</a>
+        <ul>
+          <li><a href="#captures">Captures d'écran</a></li>
+          <li><a href="#video">Vidéo explicative</a></li>
+          <li><a href="#glossaire">Glossaire</a></li>
+          <li><a href="#conseils">Conseils pratiques</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+</div>
+{% endblock %}

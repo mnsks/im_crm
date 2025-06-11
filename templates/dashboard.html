@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row g-0">
+        <div class="col-md-12">
+            <h2 class="m-0">Bienvenue sur votre tableau de bord, {{ user.username }} !</h2>
+            <p class="text-muted mb-2">Rôle : <strong>{{ user.get_role_display }}</strong></p>
+        </div>
+    </div>
+    <div class="row g-2">
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-tasks text-primary"></i> Missions actives</h5>
+                    <p class="display-5">{{ nb_missions }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-users text-success"></i> Agents actifs</h5>
+                    <p class="display-5">{{ nb_agents }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-chart-line text-info"></i> Taux de satisfaction</h5>
+                    <p class="display-5">{{ taux_satisfaction }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-envelope text-warning"></i> Feedbacks récents</h5>
+                    <p class="display-5">{{ nb_feedbacks }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-2 mt-2">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-white"><i class="fas fa-chart-pie"></i> Statistiques des missions</div>
+                <div class="card-body">
+                    <!-- Ici tu pourras intégrer un graphique Chart.js ou autre -->
+                    <canvas id="missionsChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-white"><i class="fas fa-comments"></i> Derniers feedbacks</div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">"Très satisfait du support !" <span class="badge bg-success">Client</span></li>
+                        <li class="list-group-item">"Délai de réponse rapide." <span class="badge bg-info">Entreprise</span></li>
+                        <li class="list-group-item">"Formation claire et efficace." <span class="badge bg-primary">Agent</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+var ctx = document.getElementById('missionsChart').getContext('2d');
+var missionsChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Réussies', 'En cours', 'Échouées'],
+        datasets: [{
+            data: [8, 3, 1],
+            backgroundColor: ['#00BFFF', '#003366', '#F5F5F5'],
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } }
+    }
+});
+</script>
+{% endblock %}

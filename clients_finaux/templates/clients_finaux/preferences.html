@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mes préférences de contact{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-cog"></i> Mes préférences de contact</h2>
+        </div>
+        <div class="col text-end">
+            <a href="{% url 'clients_finaux:modifier_preferences' %}" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Modifier mes préférences
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Informations de contact</h5>
+                    
+                    <div class="mb-4">
+                        <h6 class="text-muted">Mode de contact préféré</h6>
+                        <p class="lead">{{ preferences.get_mode_contact_prefere_display }}</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="text-muted">Horaires préférés</h6>
+                        <p class="lead">{{ preferences.horaires_preferes }}</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="text-muted">Jours exclus</h6>
+                        <p class="lead">{{ preferences.jours_exclus|default:"Aucun" }}</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="text-muted">Numéro de téléphone</h6>
+                        <p class="lead">{{ preferences.numero_telephone }}</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="text-muted">Email de contact</h6>
+                        <p class="lead">{{ preferences.email_contact }}</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="text-muted">Ne pas déranger</h6>
+                        <p class="lead">
+                            {% if preferences.ne_pas_deranger %}
+                                <span class="badge bg-danger">Activé</span>
+                            {% else %}
+                                <span class="badge bg-success">Désactivé</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">À propos des préférences</h5>
+                    <p class="card-text">
+                        Vos préférences de contact nous permettent de vous contacter aux moments qui vous conviennent le mieux.
+                        Vous pouvez les modifier à tout moment.
+                    </p>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-clock text-info"></i> Définissez vos horaires préférés</li>
+                        <li><i class="fas fa-calendar-times text-warning"></i> Indiquez les jours à éviter</li>
+                        <li><i class="fas fa-phone text-success"></i> Choisissez votre mode de contact</li>
+                        <li><i class="fas fa-moon text-danger"></i> Activez le mode "Ne pas déranger"</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

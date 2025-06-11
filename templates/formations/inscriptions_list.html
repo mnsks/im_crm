@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Liste des inscriptions{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Liste des inscriptions aux formations</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Agent</th>
+                    <th>Formation</th>
+                    <th>Date d'inscription</th>
+                    <th>Statut</th>
+                    <th>Commentaire</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inscription in inscriptions %}
+                <tr>
+                    <td>{{ inscription.agent.get_full_name }}</td>
+                    <td>{{ inscription.formation.titre }}</td>
+                    <td>{{ inscription.date_inscription|date:"d/m/Y" }}</td>
+                    <td>
+                        <span class="badge {% if inscription.statut == 'validee' %}bg-success{% elif inscription.statut == 'en_attente' %}bg-warning{% else %}bg-danger{% endif %}">
+                            {{ inscription.get_statut_display }}
+                        </span>
+                    </td>
+                    <td>{{ inscription.commentaire|default:"-" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">Aucune inscription trouvée</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

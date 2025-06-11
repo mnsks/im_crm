@@ -1,0 +1,9 @@
+# Virtual environment
+venv/
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.mypy_cache/

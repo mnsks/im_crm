@@ -1,0 +1,27 @@
+{% for feedback in recent_feedbacks %}
+<div class="feedback-item mb-3">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h6 class="mb-1">{{ feedback.mission.titre }}</h6>
+            <p class="text-muted mb-1">
+                <small>
+                    Par {{ feedback.evaluateur.get_full_name|default:feedback.evaluateur.username }} 
+                    le {{ feedback.date_creation|date:"d/m/Y H:i" }}
+                </small>
+            </p>
+        </div>
+        <div class="rating">
+            {% for i in "12345"|make_list %}
+                {% if forloop.counter <= feedback.note %}
+                    <i class="fas fa-star text-warning"></i>
+                {% else %}
+                    <i class="far fa-star text-muted"></i>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <p class="mb-0">{{ feedback.texte|truncatewords:30 }}</p>
+</div>
+{% empty %}
+<p class="text-muted text-center">Aucun feedback récent</p>
+{% endfor %}

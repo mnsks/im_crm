@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tableau de bord IA{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4">Tableau de bord Intelligence Artificielle</h1>
+
+    <div class="row">
+        <!-- Analyse des sentiments -->
+        <div class="col-xl-6 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="h5 mb-0 font-weight-bold text-primary">Analyse des Sentiments</div>
+                            <div class="mt-3">
+                                {% for sentiment in derniers_sentiments %}
+                                <div class="mb-2">
+                                    <strong>{{ sentiment.interaction.client }}</strong>
+                                    <span class="badge {% if sentiment.polarite > 0 %}badge-success{% elif sentiment.polarite < 0 %}badge-danger{% else %}badge-warning{% endif %}">
+                                        {{ sentiment.resultat }}
+                                    </span>
+                                </div>
+                                {% empty %}
+                                <p>Aucune analyse récente</p>
+                                {% endfor %}
+                            </div>
+                            <a href="{% url 'ai_tools:analyse_list' %}" class="btn btn-sm btn-primary mt-3">Voir tout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prédictions de performance -->
+        <div class="col-xl-6 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="h5 mb-0 font-weight-bold text-success">Prédictions de Performance</div>
+                            <div class="mt-3">
+                                {% for prediction in dernieres_predictions %}
+                                <div class="mb-2">
+                                    <strong>{{ prediction.agent.user.username }}</strong>
+                                    <span class="badge {% if prediction.alerte %}badge-danger{% else %}badge-success{% endif %}">
+                                        KPI: {{ prediction.kpi_predit|floatformat:2 }}
+                                    </span>
+                                </div>
+                                {% empty %}
+                                <p>Aucune prédiction récente</p>
+                                {% endfor %}
+                            </div>
+                            <a href="{% url 'ai_tools:prediction_list' %}" class="btn btn-sm btn-success mt-3">Voir tout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Recommandations de formation -->
+        <div class="col-xl-6 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="h5 mb-0 font-weight-bold text-info">Recommandations de Formation</div>
+                            <div class="mt-3">
+                                {% for recommandation in dernieres_recommandations %}
+                                <div class="mb-2">
+                                    <strong>{{ recommandation.agent.user.username }}</strong>
+                                    <span class="text-info">{{ recommandation.formation.titre }}</span>
+                                    <span class="badge badge-info">Score: {{ recommandation.score|floatformat:2 }}</span>
+                                </div>
+                                {% empty %}
+                                <p>Aucune recommandation récente</p>
+                                {% endfor %}
+                            </div>
+                            <a href="{% url 'ai_tools:recommandation_list' %}" class="btn btn-sm btn-info mt-3">Voir tout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Optimisation des plannings -->
+        <div class="col-xl-6 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="h5 mb-0 font-weight-bold text-warning">Optimisation des Plannings</div>
+                            <div class="mt-3">
+                                {% for optimisation in dernieres_optimisations %}
+                                <div class="mb-2">
+                                    <strong>{{ optimisation.date_optimisation|date:"d/m/Y" }}</strong>
+                                    <span class="badge badge-warning">Score: {{ optimisation.score_optimisation|floatformat:2 }}</span>
+                                    <div class="small">
+                                        {{ optimisation.nombre_agents }} agents - {{ optimisation.nombre_missions }} missions
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <p>Aucune optimisation récente</p>
+                                {% endfor %}
+                            </div>
+                            <a href="{% url 'ai_tools:optimisation_list' %}" class="btn btn-sm btn-warning mt-3">Voir tout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Actualisation automatique toutes les 5 minutes
+    setTimeout(function() {
+        location.reload();
+    }, 300000);
+</script>
+{% endblock %}

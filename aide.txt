@@ -1,0 +1,28 @@
+Administrateur: 
+Mohamed/ALFATTAh@2025*
+
+Centre d'Appel:
+centre1/centre1
+
+Donneur d'Ordre
+donneur_ordre1/
+
+Agent:
+sophie.michel1 / password123
+
+
+j'ai tester sophie.michel1 / password123
+il y a probléme de connexion
+je renseigne le login et le mot de passe
+je clic sur le bouton "se connecter" -> redirection vers http://127.0.0.1:8000/accounts/login/?next=/
+
+rmdir /s /q .git
+del .gitignore
+git init
+
+
+git status
+git add .
+git commit -m "Initial commit of crm_externalisation project with venv ignored"
+
+ALFATTAh@2025*

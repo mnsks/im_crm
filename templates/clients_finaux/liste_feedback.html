@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mes Feedbacks{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Mes Feedbacks</h2>
+        <a href="{% url 'clients_finaux:nouveau_feedback' %}" class="btn btn-primary">
+            Nouveau Feedback
+        </a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if feedbacks %}
+        <div class="list-group">
+            {% for feedback in feedbacks %}
+                <div class="list-group-item">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Mission: {{ feedback.mission.titre }}</h5>
+                        <small class="text-muted">{{ feedback.date_creation|date:"d/m/Y H:i" }}</small>
+                    </div>
+                    <p class="mb-1">
+                        <strong>Agent évalué:</strong> {{ feedback.agent.get_full_name|default:feedback.agent.username }}
+                    </p>
+                    <p class="mb-1">
+                        <strong>Note:</strong> 
+                        {% for i in "12345"|make_list %}
+                            {% if forloop.counter <= feedback.note %}
+                                <i class="fas fa-star text-warning"></i>
+                            {% else %}
+                                <i class="far fa-star text-muted"></i>
+                            {% endif %}
+                        {% endfor %}
+                        ({{ feedback.get_note_display }})
+                    </p>
+                    <p class="mb-0">{{ feedback.commentaire|truncatewords:50 }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Vous n'avez pas encore donné de feedback.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

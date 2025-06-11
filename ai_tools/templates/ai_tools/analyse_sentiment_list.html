@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Analyses de Sentiment{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4">Analyses de Sentiment</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Historique des analyses</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Client</th>
+                            <th>Interaction</th>
+                            <th>Résultat</th>
+                            <th>Polarité</th>
+                            <th>Subjectivité</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for analyse in analyses %}
+                        <tr>
+                            <td>{{ analyse.date|date:"d/m/Y H:i" }}</td>
+                            <td>{{ analyse.interaction.client }}</td>
+                            <td>{{ analyse.interaction.type_interaction }}</td>
+                            <td>
+                                <span class="badge {% if analyse.polarite > 0 %}badge-success{% elif analyse.polarite < 0 %}badge-danger{% else %}badge-warning{% endif %}">
+                                    {{ analyse.resultat }}
+                                </span>
+                            </td>
+                            <td>{{ analyse.polarite|floatformat:2 }}</td>
+                            <td>{{ analyse.subjectivite|floatformat:2 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">Aucune analyse disponible</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if is_paginated %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédent</a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#dataTable').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/French.json"
+            }
+        });
+    });
+</script>
+{% endblock %}

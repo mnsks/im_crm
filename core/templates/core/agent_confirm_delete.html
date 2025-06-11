@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirmer la Suppression de l'Agent - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-3">
+        <div class="col">
+            <h2>Confirmer la Suppression de l'Agent</h2>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <p>Êtes-vous sûr de vouloir supprimer l'agent <strong>{{ agent.username }}</strong> ({{ agent.get_full_name|default:"" }}) ?</p>
+            <p class="text-danger">Cette action est irréversible.</p>
+            
+            <form method="post" action="{% url 'agent_delete' agent.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Oui, supprimer définitivement</button>
+                <a href="{% url 'agent_detail' agent.id %}" class="btn btn-secondary">Non, annuler</a>
+            </form>
+            
+            {# Option pour désactiver au lieu de supprimer #}
+            {# 
+            <hr>
+            <p>Alternativement, vous pouvez désactiver cet agent. Il ne pourra plus se connecter mais ses données seront conservées.</p>
+            <form method="post" action="{% url 'agent_deactivate' agent.id %}"> {% comment %} Créez cette URL et vue si besoin {% endcomment %}
+                {% csrf_token %}
+                <button type="submit" class="btn btn-warning">Désactiver l'agent</button>
+            </form>
+            #}
+        </div>
+    </div>
+</div>
+{% endblock %}

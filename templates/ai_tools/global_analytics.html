@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Analytics Global</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Performance Globale</h5>
+                    <div class="metric-value">{{ performance_globale|default:"0.00"|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Satisfaction Client</h5>
+                    <div class="metric-value">{{ satisfaction_client|default:"0.00"|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Qualité Moyenne</h5>
+                    <div class="metric-value">{{ qualite_moyenne|default:"0.00"|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Taux de Formation</h5>
+                    <div class="metric-value">{{ taux_formation|default:"0.00"|floatformat:2 }}%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Tendances Performance</h5>
+                    <div id="performanceChart"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Distribution des KPIs</h5>
+                    <div id="kpiDistributionChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Analyse par Centre d'Appel</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Centre</th>
+                                    <th>Performance</th>
+                                    <th>Satisfaction</th>
+                                    <th>Qualité</th>
+                                    <th>Formations</th>
+                                    <th>Tendance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for centre in centres %}
+                                    <tr>
+                                        <td>{{ centre.nom }}</td>
+                                        <td class="{% if centre.performance < 0.65 %}text-danger{% elif centre.performance < 0.8 %}text-warning{% else %}text-success{% endif %}">
+                                            {{ centre.performance|floatformat:2 }}
+                                        </td>
+                                        <td class="{% if centre.satisfaction < 0.65 %}text-danger{% elif centre.satisfaction < 0.8 %}text-warning{% else %}text-success{% endif %}">
+                                            {{ centre.satisfaction|floatformat:2 }}
+                                        </td>
+                                        <td class="{% if centre.qualite < 0.65 %}text-danger{% elif centre.qualite < 0.8 %}text-warning{% else %}text-success{% endif %}">
+                                            {{ centre.qualite|floatformat:2 }}
+                                        </td>
+                                        <td>{{ centre.taux_formation|floatformat:2 }}%</td>
+                                        <td>
+                                            {% if centre.tendance > 0 %}
+                                                <i class="fas fa-arrow-up text-success"></i>
+                                            {% elif centre.tendance < 0 %}
+                                                <i class="fas fa-arrow-down text-danger"></i>
+                                            {% else %}
+                                                <i class="fas fa-equals text-warning"></i>
+                                            {% endif %}
+                                            {{ centre.tendance|floatformat:2 }}%
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Points Forts</h5>
+                    <ul class="list-unstyled">
+                        {% for point in points_forts %}
+                            <li><i class="fas fa-check-circle text-success"></i> {{ point }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Axes d'Amélioration</h5>
+                    <ul class="list-unstyled">
+                        {% for axe in axes_amelioration %}
+                            <li><i class="fas fa-exclamation-circle text-warning"></i> {{ axe }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.metric-value {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 1rem;
+}
+</style>
+
+{% block extra_js %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+    // Code JavaScript pour les graphiques Plotly
+    // À implémenter selon les données disponibles
+</script>
+{% endblock %}
+{% endblock %}

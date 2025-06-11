@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+{% block title %}KPIs - {{ block.super }}{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Liste des KPIs</h2>
+        {% if user.is_authenticated and user.role == 'admin' %}
+            <a href="{% url 'kpi_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Nouveau KPI</a>
+        {% endif %}
+    </div>
+    <!-- Sélecteur de courbes KPI + Export PNG -->
+    <div class="mb-2 d-flex align-items-center gap-3 flex-wrap">
+        <div class="flex-grow-1">
+            <label for="kpi-select" class="form-label fw-bold">Afficher les courbes :</label>
+            <select id="kpi-select" class="form-select" multiple size="3">
+                {% for nom in kpi_chart_data|dictsort:"0" %}
+                    <option value="{{ nom.0 }}" selected>{{ nom.0 }}</option>
+                {% endfor %}
+            </select>
+            <small class="text-muted">Ctrl+clic pour sélectionner/désélectionner plusieurs courbes.</small>
+        </div>
+        <div>
+            <button id="export-png-btn" class="btn btn-outline-secondary" type="button">
+                <i class="fas fa-image"></i> Exporter le graphique
+            </button>
+            <button id="export-pdf-btn" class="btn btn-outline-secondary ms-2" type="button">
+                <i class="fas fa-file-pdf"></i> Exporter PDF
+            </button>
+            <button id="export-csv-graph-btn" class="btn btn-outline-secondary ms-2" type="button">
+                <i class="fas fa-file-csv"></i> Exporter CSV (graphique)
+            </button>
+        </div>
+    </div>
+    <!-- Chart.js (visualisation graphique) -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-chart-line"></i> Évolution des KPIs</h5>
+            <canvas id="kpiChart" height="80"></canvas>
+        </div>
+    </div>
+    <!-- Formulaire de filtres avancés -->
+    <form method="get" class="row g-3 mb-3 align-items-end">
+        <div class="col-md-2">
+            <label for="date_debut" class="form-label">Date début</label>
+            <input type="date" class="form-control" id="date_debut" name="date_debut" value="{{ request.GET.date_debut|default:'' }}">
+        </div>
+        <div class="col-md-2">
+            <label for="date_fin" class="form-label">Date fin</label>
+            <input type="date" class="form-control" id="date_fin" name="date_fin" value="{{ request.GET.date_fin|default:'' }}">
+        </div>
+        <div class="col-md-2">
+            <label for="centre" class="form-label">Centre d'appels</label>
+            <select class="form-select" id="centre" name="centre">
+                <option value="">Tous</option>
+                {% for c in centres %}
+                    <option value="{{ c.id }}" {% if request.GET.centre == c.id|stringformat:'s' %}selected{% endif %}>{{ c.nom }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="mission" class="form-label">Mission</label>
+            <select class="form-select" id="mission" name="mission">
+                <option value="">Toutes</option>
+                {% for m in missions %}
+                    <option value="{{ m.id }}" {% if request.GET.mission == m.id|stringformat:'s' %}selected{% endif %}>{{ m.nom }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="entreprise" class="form-label">Entreprise</label>
+            <select class="form-select" id="entreprise" name="entreprise">
+                <option value="">Toutes</option>
+                {% for e in entreprises %}
+                    <option value="{{ e.id }}" {% if request.GET.entreprise == e.id|stringformat:'s' %}selected{% endif %}>{{ e.nom }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-outline-primary w-100"><i class="fas fa-search"></i> Filtrer</button>
+        </div>
+        {% if request.GET.date_debut or request.GET.date_fin or request.GET.centre or request.GET.mission or request.GET.entreprise %}
+        <div class="col-md-2 mt-2">
+            <a href="{% url 'kpi_list' %}" class="btn btn-outline-secondary w-100">Réinitialiser</a>
+        </div>
+        {% endif %}
+        <div class="col-md-2 text-end">
+            <a href="#" id="export-csv-btn" class="btn btn-success w-100"><i class="fas fa-file-csv"></i> Exporter CSV</a>
+        </div>
+    </form>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+    document.getElementById('export-csv-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        // Construit l’URL avec les mêmes paramètres GET
+        const form = this.closest('form');
+        const params = new URLSearchParams(new FormData(form)).toString();
+        window.location.href = "{% url 'kpi_export_csv' %}?" + params;
+    });
+
+    // Chart.js dynamique avec sélecteur
+    const labels = {{ kpi_chart_labels|safe }};
+    const chartData = {{ kpi_chart_data|safe }};
+    const colors = [
+        '#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6610f2', '#fd7e14', '#20c997', '#6f42c1', '#e83e8c'
+    ];
+    function getSelectedKPI() {
+        const select = document.getElementById('kpi-select');
+        return Array.from(select.selectedOptions).map(opt => opt.value);
+    }
+    function buildDatasets(selected) {
+        let idx = 0;
+        return selected.map(kpiName => ({
+            label: kpiName,
+            data: chartData[kpiName],
+            borderColor: colors[idx % colors.length],
+            backgroundColor: colors[idx % colors.length],
+            spanGaps: true,
+            tension: 0.2,
+            pointRadius: 3,
+            fill: false
+        })).map((ds, i) => { ds.borderWidth = 2; return ds; });
+    }
+    const ctx = document.getElementById('kpiChart').getContext('2d');
+    let chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: buildDatasets(getSelectedKPI())
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                },
+                title: {
+                    display: false
+                }
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            scales: {
+                x: {
+                    title: { display: true, text: 'Date' }
+                },
+                y: {
+                    title: { display: true, text: 'Valeur' },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    document.getElementById('kpi-select').addEventListener('change', function() {
+        chartInstance.data.datasets = buildDatasets(getSelectedKPI());
+        chartInstance.update();
+    });
+    // Export PNG du graphique
+    document.getElementById('export-png-btn').addEventListener('click', function() {
+        const link = document.createElement('a');
+        link.download = 'kpi-graphique.png';
+        link.href = chartInstance.toBase64Image();
+        link.click();
+    });
+    // Export PDF du graphique
+    document.getElementById('export-pdf-btn').addEventListener('click', function() {
+        const chartCanvas = document.getElementById('kpiChart');
+        html2canvas(chartCanvas, {backgroundColor: '#fff'}).then(function(canvas) {
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({orientation: 'landscape'});
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            // Titre
+            pdf.setFontSize(16);
+            pdf.text('Évolution des KPIs', pageWidth/2, 14, {align: 'center'});
+            // Graphique
+            const imgProps = pdf.getImageProperties(imgData);
+            let pdfWidth = pageWidth - 30;
+            let pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            if (pdfHeight > pageHeight - 40) {
+                pdfHeight = pageHeight - 40;
+                pdfWidth = (imgProps.width * pdfHeight) / imgProps.height;
+            }
+            pdf.addImage(imgData, 'PNG', (pageWidth-pdfWidth)/2, 20, pdfWidth, pdfHeight);
+            // Légende
+            let legendY = 20 + pdfHeight + 10;
+            let colorIdx = 0;
+            const selected = getSelectedKPI();
+            pdf.setFontSize(12);
+            selected.forEach(function(kpiName) {
+                pdf.setTextColor(0,0,0);
+                pdf.setDrawColor(colors[colorIdx % colors.length]);
+                pdf.setFillColor(colors[colorIdx % colors.length]);
+                pdf.rect(20, legendY-4, 6, 6, 'F');
+                pdf.text(kpiName, 28, legendY+1);
+                legendY += 8;
+                colorIdx++;
+            });
+            pdf.save('kpi-graphique.pdf');
+        });
+    });
+    // Export CSV des données du graphique
+    document.getElementById('export-csv-graph-btn').addEventListener('click', function() {
+        const selected = getSelectedKPI();
+        let csv = 'Date;'+selected.join(';')+'\n';
+        for (let i = 0; i < labels.length; i++) {
+            let row = [labels[i]];
+            selected.forEach(function(kpiName) {
+                let val = chartData[kpiName][i];
+                row.push(val !== null && val !== undefined ? val : '');
+            });
+            csv += row.join(';')+'\n';
+        }
+        const blob = new Blob([csv], {type: 'text/csv'});
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'kpi-graphique.csv';
+        link.click();
+    });
+
+    </script>
+    {% if kpis %}
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Valeur</th>
+                            <th>Date</th>
+                            <th>Mission</th>
+                            <th>Centre d'appels</th>
+                            <th>Entreprise</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for kpi in kpis %}
+                        <tr>
+                            <td>{{ kpi.nom }}</td>
+                            <td>{{ kpi.valeur }}</td>
+                            <td>{{ kpi.date }}</td>
+                            <td>{{ kpi.mission.nom|default:'-' }}</td>
+                            <td>{{ kpi.centre.nom|default:'-' }}</td>
+                            <td>{{ kpi.entreprise.nom|default:'-' }}</td>
+                            {% if user.is_authenticated and user.role == 'admin' %}
+                            <td>
+                                <a href="{% url 'kpi_update' kpi.id %}" class="btn btn-sm btn-outline-primary me-1" title="Modifier"><i class="fas fa-edit"></i></a>
+                                <a href="{% url 'kpi_delete' kpi.id %}" class="btn btn-sm btn-outline-danger" title="Supprimer"><i class="fas fa-trash"></i></a>
+                            </td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+        <div class="alert alert-info">Aucun KPI enregistré.</div>
+    {% endif %}
+
+    {% if is_paginated %}
+    <nav aria-label="Pagination KPIs" class="mt-3">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?{% if request.GET.date_debut %}date_debut={{ request.GET.date_debut|urlencode }}&amp;{% endif %}{% if request.GET.date_fin %}date_fin={{ request.GET.date_fin|urlencode }}&amp;{% endif %}{% if request.GET.centre %}centre={{ request.GET.centre }}&amp;{% endif %}{% if request.GET.mission %}mission={{ request.GET.mission }}&amp;{% endif %}{% if request.GET.entreprise %}entreprise={{ request.GET.entreprise }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">&laquo;</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+            {% endif %}
+            {% for num in paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?{% if request.GET.date_debut %}date_debut={{ request.GET.date_debut|urlencode }}&amp;{% endif %}{% if request.GET.date_fin %}date_fin={{ request.GET.date_fin|urlencode }}&amp;{% endif %}{% if request.GET.centre %}centre={{ request.GET.centre }}&amp;{% endif %}{% if request.GET.mission %}mission={{ request.GET.mission }}&amp;{% endif %}{% if request.GET.entreprise %}entreprise={{ request.GET.entreprise }}&amp;{% endif %}page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?{% if request.GET.date_debut %}date_debut={{ request.GET.date_debut|urlencode }}&amp;{% endif %}{% if request.GET.date_fin %}date_fin={{ request.GET.date_fin|urlencode }}&amp;{% endif %}{% if request.GET.centre %}centre={{ request.GET.centre }}&amp;{% endif %}{% if request.GET.mission %}mission={{ request.GET.mission }}&amp;{% endif %}{% if request.GET.entreprise %}entreprise={{ request.GET.entreprise }}&amp;{% endif %}page={{ page_obj.next_page_number }}">&raquo;</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

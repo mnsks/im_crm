@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} un Client{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title mb-0">{{ action }} un Client</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {% for field in form %}
+                        <div class="form-group mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">
+                                {{ field.label }}
+                                {% if field.field.required %}
+                                <span class="text-danger">*</span>
+                                {% endif %}
+                            </label>
+                            {{ field }}
+                            {% if field.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ field.errors|join:", " }}
+                            </div>
+                            {% endif %}
+                            {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'clients:client_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Retour
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-group label {
+        font-weight: 500;
+    }
+    textarea {
+        resize: vertical;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Ajouter la classe form-control à tous les champs
+        $('input, textarea, select').addClass('form-control');
+        
+        // Initialiser les champs de téléphone avec un masque
+        $('input[type="tel"]').inputmask("99 99 99 99 99");
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Analytics Formation</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Taux de Participation</h5>
+                    <div class="metric-value">{{ taux_participation|default:"0.00"|floatformat:2 }}%</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Score Moyen</h5>
+                    <div class="metric-value">{{ score_moyen|default:"0.00"|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Satisfaction Moyenne</h5>
+                    <div class="metric-value">{{ satisfaction_moyenne|default:"0.00"|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Impact Performance</h5>
+                    <div class="metric-value">
+                        {% if impact_performance > 0 %}
+                            <i class="fas fa-arrow-up text-success"></i>
+                        {% elif impact_performance < 0 %}
+                            <i class="fas fa-arrow-down text-danger"></i>
+                        {% else %}
+                            <i class="fas fa-equals text-warning"></i>
+                        {% endif %}
+                        {{ impact_performance|default:"0"|floatformat:2 }}%
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Top Formations</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Formation</th>
+                                    <th>Score</th>
+                                    <th>Satisfaction</th>
+                                    <th>Impact</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for formation in top_formations %}
+                                    <tr>
+                                        <td>{{ formation.titre }}</td>
+                                        <td>{{ formation.score|floatformat:2 }}</td>
+                                        <td>{{ formation.satisfaction|floatformat:2 }}</td>
+                                        <td>
+                                            {% if formation.impact > 0 %}
+                                                <span class="text-success">+{{ formation.impact|floatformat:2 }}%</span>
+                                            {% else %}
+                                                <span class="text-danger">{{ formation.impact|floatformat:2 }}%</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Distribution des Scores</h5>
+                    <div id="scoreDistributionChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Analyse par Type de Formation</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Nombre</th>
+                                    <th>Participation</th>
+                                    <th>Score Moyen</th>
+                                    <th>Satisfaction</th>
+                                    <th>Impact</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for type in types_formation %}
+                                    <tr>
+                                        <td>{{ type.nom }}</td>
+                                        <td>{{ type.nombre }}</td>
+                                        <td>{{ type.participation|floatformat:2 }}%</td>
+                                        <td>{{ type.score|floatformat:2 }}</td>
+                                        <td>{{ type.satisfaction|floatformat:2 }}</td>
+                                        <td>
+                                            {% if type.impact > 0 %}
+                                                <span class="text-success">+{{ type.impact|floatformat:2 }}%</span>
+                                            {% else %}
+                                                <span class="text-danger">{{ type.impact|floatformat:2 }}%</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Recommandations</h5>
+                    <ul class="list-unstyled">
+                        {% for recommandation in recommandations %}
+                            <li class="mb-3">
+                                <i class="fas fa-lightbulb text-warning"></i>
+                                <strong>{{ recommandation.titre }}</strong>
+                                <p class="mb-0">{{ recommandation.description }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Tendances</h5>
+                    <div id="trendsChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.metric-value {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 1rem;
+}
+</style>
+
+{% block extra_js %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+    // Code JavaScript pour les graphiques Plotly
+    // À implémenter selon les données disponibles
+</script>
+{% endblock %}
+{% endblock %}

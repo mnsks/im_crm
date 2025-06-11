@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Liste des formations{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3">
+                <i class="fas fa-graduation-cap text-primary"></i> 
+                Formations disponibles
+            </h2>
+            <p class="text-muted">Découvrez les formations disponibles et inscrivez-vous</p>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for formation in formations %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">{{ formation.titre }}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        <i class="fas fa-calendar me-2"></i>{{ formation.date|date:"d/m/Y" }}
+                    </p>
+                    <p class="mb-4">{{ formation.description }}</p>
+                    
+                    {% if formation.id in formations_suivies %}
+                    <div class="alert alert-success mb-3">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Formation suivie
+                    </div>
+                    {% else %}
+                    <a href="{% url 'formations:inscription_formation' formation.id %}" class="btn btn-primary">
+                        <i class="fas fa-plus-circle me-2"></i>S'inscrire
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Aucune formation n'est disponible pour le moment.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.card {
+    transition: transform 0.3s ease;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+.card-header {
+    border-bottom: none;
+}
+.alert {
+    margin-bottom: 0;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>Tableau de bord KPIs</h1>
+        </div>
+        <div class="col-auto">
+            <div class="btn-group">
+                <a href="?period=week" class="btn btn-outline-primary {% if period == 'week' %}active{% endif %}">7 jours</a>
+                <a href="?period=month" class="btn btn-outline-primary {% if period == 'month' %}active{% endif %}">30 jours</a>
+                <a href="?period=year" class="btn btn-outline-primary {% if period == 'year' %}active{% endif %}">365 jours</a>
+            </div>
+            <a href="{% url 'kpis:export' %}?period={{ period }}" class="btn btn-success ms-2">
+                <i class="fas fa-download"></i> Exporter
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- KPI Missions -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Missions</h5>
+                    <div class="row">
+                        <div class="col">
+                            <p class="mb-1">Total missions</p>
+                            <h3 class="mb-3">{{ total_missions }}</h3>
+                        </div>
+                        <div class="col">
+                            <p class="mb-1">Missions terminées</p>
+                            <h3 class="mb-3">{{ missions_terminees }}</h3>
+                        </div>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: {{ taux_completion }}%">
+                            {{ taux_completion|floatformat:1 }}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI Agents -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Agents</h5>
+                    <p class="mb-1">Agents actifs</p>
+                    <h3>{{ agents_actifs }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI Saisies -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Saisies</h5>
+                    <div class="row">
+                        <div class="col">
+                            <p class="mb-1">Total saisies</p>
+                            <h3>{{ total_saisies }}</h3>
+                        </div>
+                        <div class="col">
+                            <p class="mb-1">Durée moyenne</p>
+                            <h3>{{ duree_moyenne|time:"H:i:s" }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

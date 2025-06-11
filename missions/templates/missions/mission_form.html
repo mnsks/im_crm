@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if mission %}Modifier{% else %}Nouvelle{% endif %} mission{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="card-title">{% if mission %}Modifier{% else %}Nouvelle{% endif %} mission</h1>
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="titre" class="form-label">Titre</label>
+                            <input type="text" name="titre" id="titre" class="form-control" value="{{ mission.titre|default:'' }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="client" class="form-label">Client</label>
+                            <select name="client" id="client" class="form-select" required>
+                                <option value="">Sélectionner un client</option>
+                                {% for client in clients %}
+                                <option value="{{ client.pk }}" {% if mission and mission.client == client %}selected{% endif %}>
+                                    {{ client.nom }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="centre" class="form-label">Centre d'appels</label>
+                            <select name="centre" id="centre" class="form-select" required>
+                                <option value="">Sélectionner un centre</option>
+                                {% for centre in centres %}
+                                <option value="{{ centre.pk }}" {% if mission and mission.centre == centre %}selected{% endif %}>
+                                    {{ centre.nom }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="date_debut" class="form-label">Date début</label>
+                                    <input type="date" name="date_debut" id="date_debut" class="form-control" value="{{ mission.date_debut|date:'Y-m-d'|default:'' }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="date_fin" class="form-label">Date fin</label>
+                                    <input type="date" name="date_fin" id="date_fin" class="form-control" value="{{ mission.date_fin|date:'Y-m-d'|default:'' }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Statut</label>
+                            <select name="status" id="status" class="form-select" required>
+                                {% for status, label in status_choices %}
+                                <option value="{{ status }}" {% if mission and mission.status == status %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea name="description" id="description" class="form-control" rows="4">{{ mission.description|default:'' }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="objectifs" class="form-label">Objectifs</label>
+                            <textarea name="objectifs" id="objectifs" class="form-control" rows="4">{{ mission.objectifs|default:'' }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="agents" class="form-label">Agents assignés</label>
+                            <select name="agents" id="agents" class="form-select" multiple>
+                                {% for agent in agents %}
+                                <option value="{{ agent.pk }}" {% if mission and agent in mission.agents.all %}selected{% endif %}>
+                                    {{ agent.get_full_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Maintenez Ctrl (Windows) ou Cmd (Mac) pour sélectionner plusieurs agents.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="documents" class="form-label">Documents</label>
+                            <input type="file" name="documents" id="documents" class="form-control" multiple>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'missions:list' %}" class="btn btn-secondary">Annuler</a>
+                            <button type="submit" class="btn btn-primary">
+                                {% if mission %}Mettre à jour{% else %}Créer{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

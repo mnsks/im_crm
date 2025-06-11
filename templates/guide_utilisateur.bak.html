@@ -1,0 +1,502 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+  <h1>Guide Utilisateur – CRM</h1>
+  <p class="lead">Ce guide vous accompagne dans l'utilisation du CRM selon votre rôle. Utilisez le sommaire pour accéder rapidement à la section souhaitée.</p>
+
+  <nav class="mb-4">
+    <b>Sommaire :</b>
+    <ul class="list-unstyled">
+      <li><a href="#introduction">1. Introduction générale</a></li>
+      <li><a href="#navigation">2. Navigation globale</a></li>
+      <li><a href="#roles">3. Guide par rôle</a>
+        <ul>
+          <li><a href="#admin">Administrateur</a></li>
+          <li><a href="#donneur">Donneur d'Ordre</a></li>
+          <li><a href="#centre">Centre d'Appel</a></li>
+          <li><a href="#agent">Agent</a></li>
+          <li><a href="#client">Client final</a></li>
+        </ul>
+      </li>
+      <li><a href="#transverse">4. Fonctionnalités transverses</a></li>
+      <li><a href="#faq">5. FAQ et dépannage</a></li>
+      <li><a href="#annexes">6. Annexes (captures, vidéos, glossaire...)</a></li>
+    </ul>
+  </nav>
+
+  <h2 id="workflow">Workflow complet d'une opération</h2>
+  <div class="workflow-section">
+    <div class="timeline">
+      <div class="timeline-item">
+        <h4>1. Phase Initiale - Entreprise Donneuse d'Ordre (EDO)</h4>
+        <ul>
+          <li>Inscription de l'entreprise sur la plateforme</li>
+          <li>Création des comptes donneurs d'ordre</li>
+          <li>Configuration des préférences et paramètres</li>
+        </ul>
+      </div>
+      <div class="timeline-item">
+        <h4>2. Création de Mission - Donneur d'Ordre</h4>
+        <ul>
+          <li>Définition du titre et des objectifs</li>
+          <li>Spécification des KPIs et métriques</li>
+          <li>Sélection du centre d'appels partenaire</li>
+          <li>Upload des documents nécessaires</li>
+          <li>Configuration des délais et priorités</li>
+        </ul>
+      </div>
+      <div class="timeline-item">
+        <h4>3. Préparation - Centre d'Appels</h4>
+        <ul>
+          <li>Réception et analyse de la mission</li>
+          <li>Sélection et assignation des agents qualifiés</li>
+          <li>Planification des horaires et ressources</li>
+          <li>Préparation des scripts et supports</li>
+          <li>Formation spécifique si nécessaire</li>
+        </ul>
+      </div>
+      <div class="timeline-item">
+        <h4>4. Exécution - Agent</h4>
+        <ul>
+          <li>Consultation du planning quotidien</li>
+          <li>Prise de connaissance des objectifs</li>
+          <li>Contact avec les clients finaux</li>
+          <li>Saisie des résultats en temps réel</li>
+          <li>Mise à jour des statuts d'appel</li>
+        </ul>
+      </div>
+      <div class="timeline-item">
+        <h4>5. Interaction - Client Final</h4>
+        <ul>
+          <li>Réception des appels des agents</li>
+          <li>Consultation de l'historique des appels</li>
+          <li>Soumission de requêtes si besoin</li>
+          <li>Envoi de feedback sur les interactions</li>
+          <li>Mise à jour des préférences de contact</li>
+        </ul>
+      </div>
+      <div class="timeline-item">
+        <h4>6. Supervision - Centre d'Appels</h4>
+        <ul>
+          <li>Monitoring en temps réel des KPIs</li>
+          <li>Contrôle qualité des appels</li>
+          <li>Ajustement des ressources si nécessaire</li>
+          <li>Gestion des incidents et urgences</li>
+          <li>Communication avec le donneur d'ordre</li>
+        </ul>
+      </div>
+      <div class="timeline-item">
+        <h4>7. Suivi - Donneur d'Ordre</h4>
+        <ul>
+          <li>Consultation des tableaux de bord</li>
+          <li>Analyse des KPIs et métriques</li>
+          <li>Revue des feedbacks clients</li>
+          <li>Ajustement des objectifs si nécessaire</li>
+          <li>Validation des résultats</li>
+        </ul>
+      </div>
+      <div class="timeline-item">
+        <h4>8. Clôture - Tous les Acteurs</h4>
+        <ul>
+          <li>Génération des rapports finaux</li>
+          <li>Analyse des performances globales</li>
+          <li>Évaluation de la satisfaction client</li>
+          <li>Identification des points d'amélioration</li>
+          <li>Archivage des documents et données</li>
+        </ul>
+      </div>
+    </div>
+    <div class="alert alert-success mt-4">
+      <h5>Points Clés du Workflow</h5>
+      <ul>
+        <li><b>Traçabilité :</b> Chaque action est enregistrée et horodatée</li>
+        <li><b>Communication :</b> Tous les acteurs peuvent interagir via la plateforme</li>
+        <li><b>Qualité :</b> Contrôles et validations à chaque étape</li>
+        <li><b>Flexibilité :</b> Adaptation possible selon les besoins</li>
+        <li><b>Performance :</b> Suivi des KPIs en temps réel</li>
+      </ul>
+    </div>
+    <style>
+      .timeline {
+        position: relative;
+        padding: 20px 0;
+      }
+      .timeline-item {
+        padding: 20px;
+        margin-bottom: 20px;
+        border-left: 3px solid #007bff;
+        background-color: #f8f9fa;
+        border-radius: 0 5px 5px 0;
+      }
+      .timeline-item h4 {
+        color: #007bff;
+        margin-bottom: 15px;
+      }
+      .timeline-item ul {
+        margin-bottom: 0;
+      }
+      .timeline-item:hover {
+        background-color: #e9ecef;
+      }
+    </style>
+  </div>
+
+  <h2 id="introduction">1. Introduction générale</h2>
+  <p>Le CRM permet de piloter, suivre et optimiser toutes les interactions entre vos équipes et vos clients, selon votre rôle (Agent, Centre d'appel, Donneur d'ordre, Administrateur, Client final).</p>
+  <ul>
+    <li>Accès sécurisé par identifiant et mot de passe</li>
+    <li>Interface adaptée à chaque rôle</li>
+    <li>Historique et traçabilité des actions</li>
+  </ul>
+
+  <h2 id="navigation">2. Navigation globale</h2>
+  <ul>
+    <li><b>Barre latérale :</b> Accès rapide aux modules principaux selon votre rôle</li>
+    <li><b>Icônes :</b> Indiquent les principales fonctionnalités (missions, rapports, formations...)</li>
+    <li><b>Profil :</b> Gestion de vos informations personnelles et mot de passe</li>
+    <li><b>Guide utilisateur :</b> Accessible à tout moment via le menu</li>
+  </ul>
+
+  <h2 id="roles">3. Guide par rôle</h2>
+
+  <h3 id="admin">Administrateur</h3>
+  <ul>
+    <li><b>Tableau de bord :</b> Vue d'ensemble, KPIs, alertes</li>
+    <li><b>Gestion des agents :</b> Création, modification, désactivation</li>
+    <li><b>Gestion des centres et entreprises :</b> Suivi, création, modification</li>
+    <li><b>Suivi des formations :</b> Validation, inscription, suivi des progrès</li>
+    <li><b>Audit et contrôle qualité :</b> Accès aux rapports, gestion des incidents</li>
+  </ul>
+
+  <h3 id="donneur">Donneur d'Ordre</h3>
+  <ul>
+    <li><b>Tableau de bord :</b> Suivi des missions confiées, KPIs, feedbacks</li>
+    <li><b>Missions :</b> Création, modification, suivi en temps réel</li>
+    <li><b>Documents :</b> Upload, consultation, archivage</li>
+    <li><b>Feedbacks :</b> Consultation et émission de feedbacks</li>
+    <li><b>Messagerie :</b> Communication avec les centres et agents</li>
+  </ul>
+
+  <h3 id="centre">Centre d'Appel</h3>
+  <ul>
+    <li><b>Missions reçues :</b> Analyse, planification, attribution aux agents</li>
+    <li><b>Saisie des résultats :</b> Enregistrement des appels, statuts</li>
+    <li><b>Rapports :</b> Génération et analyse des performances</li>
+    <li><b>Formations :</b> Organisation, suivi des besoins</li>
+    <li><b>Communication :</b> Gestion des échanges internes et avec les donneurs d'ordre</li>
+  </ul>
+
+  <h3 id="agent">Agent</h3>
+  <ul>
+    <li><b>Planning :</b> Consultation du planning journalier</li>
+    <li><b>Exécution des missions :</b> Appels, saisie des résultats, gestion des rappels</li>
+    <li><b>Formation :</b> Suivi des sessions, tests, ressources pédagogiques</li>
+    <li><b>Rapport journalier :</b> Remplissage et soumission en fin de journée</li>
+    <li><b>Feedback :</b> Retour sur missions et cas particuliers</li>
+  </ul>
+
+  <h3 id="client">Client final</h3>
+  <ul>
+    <li><b>Suivi des interventions :</b> Historique des appels, statut des demandes</li>
+    <li><b>Messagerie :</b> Communication avec le centre</li>
+    <li><b>Documentation :</b> Accès et téléchargement de documents</li>
+    <li><b>Feedback :</b> Notation, suggestions, réclamations</li>
+  </ul>
+
+  <h2 id="transverse">4. Fonctionnalités transverses</h2>
+  <ul>
+    <li><b>Recherche :</b> Accès rapide à toutes les données selon vos droits</li>
+    <li><b>Notifications :</b> Alertes sur les actions importantes</li>
+    <li><b>Gestion du profil :</b> Modification des informations, mot de passe</li>
+    <li><b>Accès au guide utilisateur :</b> Depuis la barre latérale</li>
+  </ul>
+
+  <h2 id="faq">5. FAQ et dépannage</h2>
+  <ul>
+    <li><b>Problème de connexion :</b> Vérifiez vos identifiants, contactez l'administrateur</li>
+    <li><b>Mot de passe oublié :</b> Utilisez la fonction « mot de passe oublié » ou contactez l'administrateur</li>
+    <li><b>Erreur lors de la saisie :</b> Vérifiez les champs obligatoires et le format des données</li>
+    <li><b>Fonctionnalité inaccessible :</b> Vérifiez votre rôle ou contactez le support</li>
+    <li><b>Où trouver les rapports ?</b> Menu « Rapports » selon votre rôle</li>
+    <li><b>Comment contacter le support ?</b> Via la messagerie ou l'administrateur</li>
+  </ul>
+
+  <h2 id="annexes">6. Annexes</h2>
+  <h4>Captures d’écran</h4>
+  <p>Ajoutez vos propres captures dans <code>static/img/guide/</code>. Exemple :</p>
+  <img src="https://user-images.githubusercontent.com/674621/147857716-0d8b6e8b-3c6e-4b7a-9c7e-4f7a7b1a4f7a.png" alt="Exemple Dashboard" class="img-fluid mb-3" style="max-width:500px;">
+  <img src="https://user-images.githubusercontent.com/674621/147857722-1c8d1e1a-2f8e-4d9d-8a6e-2c5b3f2e1b4e.png" alt="Attribution Mission" class="img-fluid mb-3" style="max-width:500px;">
+  <img src="https://user-images.githubusercontent.com/674621/147857727-1e2d8c8e-2b7f-4e7a-9b7c-8b2b7e1a2b7e.png" alt="Feedback Client" class="img-fluid mb-3" style="max-width:500px;">
+  <p class="text-muted">(Remplacez ces fichiers par vos propres captures d’écran)</p>
+
+  <h4>Vidéo explicative</h4>
+  <p>Intégrez une vidéo YouTube ou locale :</p>
+  <div class="embed-responsive embed-responsive-16by9 mb-3">
+    <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/1K9j2v9kZzA" allowfullscreen title="Présentation CRM"></iframe>
+  </div>
+  <video controls style="max-width:500px;">
+    <source src="{% static 'videos/guide/exemple_tuto.mp4' %}" type="video/mp4">
+    Votre navigateur ne supporte pas la lecture vidéo.
+  </video>
+  <p class="text-muted">(Remplacez ce fichier par vos propres vidéos de démonstration)</p>
+
+  <h4>Glossaire</h4>
+  <ul>
+    <li><b>Mission :</b> Action ou campagne confiée à un centre ou agent</li>
+    <li><b>KPI :</b> Indicateur clé de performance</li>
+    <li><b>Feedback :</b> Retour d’expérience ou d’évaluation</li>
+    <li><b>Rapport :</b> Synthèse d’activité ou de résultats</li>
+    <li><b>Centre d’appel :</b> Structure gérant les agents et missions</li>
+  </ul>
+    }
+    .timeline-item {
+      padding: 20px;
+      margin-bottom: 20px;
+      border-left: 3px solid #007bff;
+      background-color: #f8f9fa;
+      border-radius: 0 5px 5px 0;
+    }
+    .timeline-item h4 {
+      color: #007bff;
+      margin-bottom: 15px;
+    }
+    .timeline-item ul {
+      margin-bottom: 0;
+    }
+    .timeline-item:hover {
+      background-color: #e9ecef;
+      transition: background-color 0.3s;
+    }
+  </style>
+
+  <h4>Gestion formation</h4>
+  <ul>
+    <li><b>Validation des inscriptions</b> : Approuvez ou refusez les demandes de formation.</li>
+    <li><b>Suivi global des formations</b> : Visualisez le taux de participation et les résultats.</li>
+    <li><b>Gestion du catalogue formation</b> : Ajoutez ou mettez à jour les modules disponibles.</li>
+    <li><b>Évaluation des programmes</b> : Analysez l'efficacité des parcours de formation.</li>
+  </ul>
+  <h4>Contrôle qualité</h4>
+  <ul>
+    <li><b>Audit des missions</b> : Vérifiez la conformité des missions réalisées.</li>
+    <li><b>Contrôle des procédures</b> : Assurez-vous du respect des protocoles internes.</li>
+    <li><b>Gestion des incidents</b> : Suivez et résolvez les incidents signalés.</li>
+    <li><b>Amélioration continue</b> : Proposez et suivez les actions correctives.</li>
+  </ul>
+
+  <hr>
+
+  <h2>2. Centre d'appel</h2>
+  <h4>Gestion opérationnelle des missions</h4>
+  <ul>
+    <li><b>Réception et analyse des missions</b> : Consultez les nouvelles missions reçues.</li>
+    <li><b>Planification et attribution</b> : Répartissez les missions entre agents selon les priorités.</li>
+    <li><b>Gestion des urgences</b> : Identifiez et traitez les cas prioritaires.</li>
+    <li><b>Suivi de l'avancement</b> : Contrôlez l'état d'avancement en temps réel.</li>
+  </ul>
+  <h4>Supervision et performance</h4>
+  <ul>
+    <li><b>Monitoring des saisies</b> : Vérifiez la saisie des résultats par agent.</li>
+    <li><b>Analyse des KPIs</b> : Suivez les performances individuelles et collectives.</li>
+    <li><b>Contrôle qualité des appels</b> : Écoutez des extraits et évaluez la qualité des interactions.</li>
+    <li><b>Gestion des objectifs</b> : Fixez et suivez les objectifs à atteindre.</li>
+  </ul>
+  <h4>Formation et développement</h4>
+  <ul>
+    <li><b>Organisation des formations</b> : Planifiez les sessions de formation pour les agents.</li>
+    <li><b>Évaluation des besoins</b> : Identifiez les besoins en formation via les KPIs.</li>
+    <li><b>Suivi des progrès</b> : Analysez l’évolution des compétences.</li>
+    <li><b>Coaching</b> : Organisez des sessions de coaching personnalisées.</li>
+  </ul>
+  <h4>Communication et coordination</h4>
+  <ul>
+    <li><b>Gestion des communications internes</b> : Envoyez des messages ou annonces aux équipes.</li>
+    <li><b>Liaison avec les donneurs d'ordre</b> : Assurez la communication avec les clients institutionnels.</li>
+    <li><b>Organisation des briefings</b> : Planifiez les réunions quotidiennes.</li>
+    <li><b>Gestion des remontées terrain</b> : Recueillez et traitez les retours des agents.</li>
+  </ul>
+  <h4>Reporting et analyse</h4>
+  <ul>
+    <li><b>Génération des rapports</b> : Produisez des rapports d’activité périodiques.</li>
+    <li><b>Analyse des performances</b> : Comparez les résultats par période et par équipe.</li>
+    <li><b>Suivi des objectifs mensuels</b> : Vérifiez l’atteinte des objectifs fixés.</li>
+    <li><b>Reporting aux donneurs d'ordre</b> : Transmettez les résultats aux clients.</li>
+  </ul>
+
+  <hr>
+
+  <h2>3. Donneur d'Ordre</h2>
+  <h4>Gestion des missions</h4>
+  <ul>
+    <li><b>Création/modification missions</b> : Saisissez ou ajustez les missions confiées au centre d’appel.</li>
+    <li><b>Suivi temps réel</b> : Consultez l’état d’avancement via le dashboard.</li>
+    <li><b>Définition des priorités</b> : Modifiez les priorités selon les besoins.</li>
+    <li><b>Ajustement des objectifs</b> : Redéfinissez les objectifs à tout moment.</li>
+  </ul>
+  <h4>Documentation et procédures</h4>
+  <ul>
+    <li><b>Gestion documentaire</b> : Déposez et consultez les documents liés aux missions.</li>
+    <li><b>Mise à jour des process</b> : Proposez des modifications de procédures.</li>
+    <li><b>Validation des scripts</b> : Approuvez les scripts d’appel proposés.</li>
+    <li><b>Archivage légal</b> : Accédez à l’historique pour des besoins réglementaires.</li>
+  </ul>
+  <h4>Communication et feedback</h4>
+  <ul>
+    <li><b>Messagerie interne</b> : Échangez avec les équipes du centre d’appel.</li>
+    <li><b>Envoi de feedback</b> : Donnez votre avis sur la qualité des missions réalisées.</li>
+    <li><b>Demandes spécifiques</b> : Faites des requêtes particulières selon vos besoins.</li>
+    <li><b>Suivi des réclamations</b> : Consultez l’état de vos réclamations en cours.</li>
+  </ul>
+  <h4>Analyse et reporting</h4>
+  <ul>
+    <li><b>Consultation des KPIs</b> : Visualisez les indicateurs de performance.</li>
+    <li><b>Analyse des résultats</b> : Accédez à des rapports détaillés.</li>
+    <li><b>Revue des performances</b> : Analysez les résultats sur différentes périodes.</li>
+    <li><b>Planification stratégique</b> : Utilisez les données pour ajuster votre stratégie.</li>
+  </ul>
+
+  <hr>
+
+  <h2>4. Agent</h2>
+  <h4>Planning et préparation (Matin)</h4>
+  <ul>
+    <li><b>Consultation du planning</b> : Vérifiez vos missions du jour.</li>
+    <li><b>Vérification des priorités</b> : Identifiez les tâches urgentes.</li>
+    <li><b>Préparation des scripts</b> : Relisez les scripts d’appel à utiliser.</li>
+    <li><b>Révision des fiches clients</b> : Consultez les informations sur les clients à contacter.</li>
+  </ul>
+  <h4>Exécution des missions (En continu)</h4>
+  <ul>
+    <li><b>Réalisation des appels</b> : Effectuez les appels selon le planning.</li>
+    <li><b>Saisie en temps réel</b> : Enregistrez les résultats d’appel immédiatement.</li>
+    <li><b>Mise à jour des statuts</b> : Modifiez l’état des missions après chaque appel.</li>
+    <li><b>Gestion des rappels</b> : Programmez les rappels pour les clients non joints.</li>
+  </ul>
+  <h4>Formation et développement</h4>
+  <ul>
+    <li><b>Suivi du calendrier de formation</b> : Consultez les sessions à venir.</li>
+    <li><b>Participation aux sessions</b> : Assistez aux formations assignées.</li>
+    <li><b>Tests et évaluations</b> : Passez les tests post-formation.</li>
+    <li><b>Consultation des ressources</b> : Accédez aux supports pédagogiques.</li>
+  </ul>
+  <h4>Reporting et feedback (Fin de journée)</h4>
+  <ul>
+    <li><b>Remplissage du rapport journalier</b> : Décrivez votre activité de la journée.</li>
+    <li><b>Soumission des feedbacks</b> : Donnez votre avis sur les missions réalisées.</li>
+    <li><b>Documentation des cas particuliers</b> : Notez les situations exceptionnelles rencontrées.</li>
+    <li><b>Mise à jour des indicateurs personnels</b> : Suivez vos propres performances.</li>
+  </ul>
+
+  <hr>
+
+  <h2>5. Client final</h2>
+  <h4>Suivi des interventions</h4>
+  <ul>
+    <li><b>Consultation historique d'appels</b> : Visualisez tous vos échanges passés.</li>
+    <li><b>Statut des demandes</b> : Vérifiez l’avancement de vos requêtes en cours.</li>
+    <li><b>Planning des prochains contacts</b> : Consultez les prochains rendez-vous prévus.</li>
+    <li><b>Mise à jour des préférences</b> : Modifiez vos préférences de contact.</li>
+  </ul>
+  <h4>Communication</h4>
+  <ul>
+    <li><b>Messagerie avec le centre</b> : Envoyez et recevez des messages du centre d’appel.</li>
+    <li><b>Demandes spécifiques</b> : Faites des requêtes personnalisées.</li>
+    <li><b>Modification coordonnées</b> : Mettez à jour vos informations de contact.</li>
+    <li><b>Gestion des préférences</b> : Choisissez comment et quand être contacté.</li>
+  </ul>
+  <h4>Documentation</h4>
+  <ul>
+    <li><b>Accès documents personnels</b> : Téléchargez attestations et contrats.</li>
+    <li><b>Consultation contrats</b> : Relisez vos contrats en ligne.</li>
+    <li><b>Mise à jour informations</b> : Modifiez vos données personnelles.</li>
+  </ul>
+  <h4>Feedback et satisfaction</h4>
+  <ul>
+    <li><b>Notation des interactions</b> : Évaluez la qualité des appels reçus.</li>
+    <li><b>Suggestions d'amélioration</b> : Proposez des axes d’amélioration.</li>
+    <li><b>Enquêtes satisfaction</b> : Participez aux sondages de satisfaction.</li>
+    <li><b>Réclamations éventuelles</b> : Déposez une réclamation si besoin.</li>
+  </ul>
+
+  <hr>
+
+  <h2 id="faq">FAQ – Questions Fréquentes</h2>
+  <div class="faq-section">
+    <h5>Administrateur</h5>
+    <ul>
+      <li><b>Comment ajouter un nouvel agent ?</b><br>Rendez-vous dans la section "Gestion des Agents" puis cliquez sur "Ajouter un agent".</li>
+      <li><b>Comment suivre les KPIs ?</b><br>Utilisez le menu "KPIs" pour accéder aux tableaux de bord détaillés.</li>
+    </ul>
+    <h5>Centre d'appel</h5>
+    <ul>
+      <li><b>Comment planifier une mission&nbsp;?</b><br>Depuis "Missions", cliquez sur "Nouvelle mission" et remplissez le formulaire.</li>
+      <li><b>Où trouver les rapports&nbsp;?</b><br>Accédez à la section "Rapports" dans la barre latérale.</li>
+    </ul>
+    <h5>Donneur d'Ordre</h5>
+    <ul>
+      <li><b>Comment consulter les documents&nbsp;?</b><br>Utilisez le menu "Documents" pour voir ou télécharger vos fichiers.</li>
+      <li><b>Comment envoyer un feedback&nbsp;?</b><br>La section "Feedbacks" vous permet de donner votre avis sur chaque mission.</li>
+    </ul>
+    <h5>Agent</h5>
+    <ul>
+      <li><b>Comment remplir mon rapport journalier&nbsp;?</b><br>Allez dans "Rapport journalier" et complétez le formulaire en fin de journée.</li>
+      <li><b>Comment accéder à mes formations&nbsp;?</b><br>Le menu "Formations" liste toutes vos sessions assignées.</li>
+    </ul>
+    <h5>Client final</h5>
+    <ul>
+      <li><b>Comment voir l’historique de mes appels&nbsp;?</b><br>Menu "Historique" dans votre espace personnel.</li>
+      <li><b>Comment modifier mes informations&nbsp;?</b><br>Menu "Profil" puis "Modifier mes informations".</li>
+    </ul>
+  </div>
+
+  <hr>
+
+  <h2 id="captures">Captures d’écran</h2>
+  <div class="screenshots-section">
+    <p>Pour illustrer chaque étape, vous pouvez ajouter vos propres captures d’écran dans le dossier <code>static/img/guide/</code>.<br>
+    Exemple&nbsp;:</p>
+    <img src="https://user-images.githubusercontent.com/674621/147857716-0d8b6e8b-3c6e-4b7a-9c7e-4f7a7b1a4f7a.png" alt="Exemple Dashboard" class="img-fluid mb-3" style="max-width:500px;">
+    <p class="text-muted">(Pour personnaliser, déposez vos propres images dans <code>static/img/guide/</code> et remplacez ce lien par <code>{% static 'img/guide/nom_image.png' %}</code>)</p>
+    <img src="https://user-images.githubusercontent.com/674621/147857722-1c8d1e1a-2f8e-4d9d-8a6e-2c5b3f2e1b4e.png" alt="Attribution Mission" class="img-fluid mb-3" style="max-width:500px;">
+    <img src="https://user-images.githubusercontent.com/674621/147857727-1e2d8c8e-2b7f-4e7a-9b7c-8b2b7e1a2b7e.png" alt="Feedback Client" class="img-fluid mb-3" style="max-width:500px;">
+
+    <p class="text-muted">(Remplacez ce fichier par vos propres captures d’écran pour chaque fonctionnalité)</p>
+  </div>
+
+  <hr>
+
+  <h2 id="video">Vidéo explicative</h2>
+  <div class="videos-section">
+    <p><b>Présentation rapide du CRM (exemple YouTube) :</b></p>
+    <p>Vous pouvez intégrer des vidéos explicatives pour guider les utilisateurs&nbsp;:</p>
+    <ul>
+      <li>Pour une vidéo YouTube ou Vimeo&nbsp;:</li>
+    </ul>
+    <div class="embed-responsive embed-responsive-16by9 mb-3">
+      <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/1K9j2v9kZzA" allowfullscreen title="Présentation CRM"></iframe>
+    </div>
+    <ul>
+      <li>Pour une vidéo locale, placez votre fichier dans <code>static/videos/guide/</code> et utilisez&nbsp;:</li>
+    </ul>
+    <video controls style="max-width:500px;">
+      <source src="{% static 'videos/guide/exemple_tuto.mp4' %}" type="video/mp4">
+      Votre navigateur ne supporte pas la lecture vidéo.
+    </video>
+    <p class="text-muted">(Remplacez ce fichier par vos propres vidéos de démonstration)</p>
+  </div>
+
+  <hr>
+
+  <h2 id="conseils">Conseils pratiques</h2>
+  <ul>
+    <li>Utilisez la barre latérale pour naviguer rapidement selon votre rôle.</li>
+    <li>Consultez le guide régulièrement pour découvrir de nouvelles fonctionnalités.</li>
+    <li>En cas de problème, contactez votre administrateur ou consultez la FAQ ci-dessus.</li>
+  </ul>
+
+  <div class="alert alert-secondary mt-4">
+    <b>Retour à la navigation :</b> <a href="#faq">FAQ</a> | <a href="#captures">Captures d’écran</a> | <a href="#video">Vidéo</a> | <a href="#conseils">Conseils</a>
+  </div>
+</div>
+{% endblock %}

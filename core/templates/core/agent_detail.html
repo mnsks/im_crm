@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Détail de l'Agent : {{ agent.username }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Agent : {{ agent.username }}</h2>
+        <div>
+            {% if user.is_authenticated and user.role == 'admin' %}
+            <a href="{% url 'agent_update' agent.id %}" class="btn btn-secondary me-2"><i class="fas fa-edit"></i> Modifier l'Agent</a>
+            <a href="{% url 'agent_delete' agent.id %}" class="btn btn-danger me-2"><i class="fas fa-trash"></i> Supprimer l'Agent</a>
+            {% endif %}
+            <a href="{% url 'agent_list' %}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Retour à la liste</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            Informations de l'Agent
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Nom d'utilisateur :</strong> {{ agent.username }}</p>
+                    <p><strong>Prénom :</strong> {{ agent.first_name|default:"N/A" }}</p>
+                    <p><strong>Nom :</strong> {{ agent.last_name|default:"N/A" }}</p>
+                    <p><strong>Email :</strong> {{ agent.email|default:"N/A" }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Rôle :</strong> <span class="badge bg-info">{{ agent.get_role_display }}</span></p>
+                    <dl>
+                        <dt>Centre d'appels :</dt>
+                        <dd>
+                            {% if agent.parent_centre %}
+                                <a href="{% url 'centre_detail' centre_id=agent.parent_centre.id %}">{{ agent.parent_centre.nom }}</a>
+                            {% else %}
+                                <span class="text-muted">Non rattaché</span>
+                            {% endif %}
+                        </dd>
+                    </dl>
+                    <p><strong>Statut :</strong> 
+                        {% if agent.is_active %}
+                            <span class="badge bg-success">Actif</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactif</span>
+                        {% endif %}
+                    </p>
+                    <p><strong>Date d'inscription :</strong> {{ agent.date_joined|date:"d/m/Y H:i" }}</p>
+                    <p><strong>Dernière connexion :</strong> {{ agent.last_login|date:"d/m/Y H:i"|default:"Jamais connecté" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section pour les missions assignées à l'agent (à implémenter si nécessaire) -->
+    <!-- 
+    <div class="card mt-4">
+        <div class="card-header">
+            Missions Assignées
+        </div>
+        <div class="card-body">
+            {% if agent.missions_assignees.all %}
+                <ul>
+                {% for mission in agent.missions_assignees.all %}
+                    <li><a href="{% url 'missions:mission_detail' mission.id %}">{{ mission.titre }}</a></li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>Aucune mission assignée pour le moment.</p>
+            {% endif %}
+        </div>
+    </div>
+    -->
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Supprimer le KPI - {{ block.super }}{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Supprimer le KPI</h4>
+                </div>
+                <div class="card-body">
+                    <p>Êtes-vous sûr de vouloir supprimer le KPI suivant&nbsp;?</p>
+                    <ul>
+                        <li><strong>Nom :</strong> {{ kpi.nom }}</li>
+                        <li><strong>Valeur :</strong> {{ kpi.valeur }}</li>
+                        <li><strong>Date :</strong> {{ kpi.date }}</li>
+                        <li><strong>Mission :</strong> {{ kpi.mission.nom|default:'-' }}</li>
+                        <li><strong>Centre :</strong> {{ kpi.centre.nom|default:'-' }}</li>
+                        <li><strong>Entreprise :</strong> {{ kpi.entreprise.nom|default:'-' }}</li>
+                    </ul>
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Confirmer la suppression</button>
+                        <a href="{% url 'kpi_list' %}" class="btn btn-secondary ms-2">Annuler</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

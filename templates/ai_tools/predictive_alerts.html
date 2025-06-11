@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Alertes Prédictives</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Alertes Actives</h5>
+                    <div class="metric-value">{{ nombre_alertes_actives|default:"0" }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Niveau de Risque Global</h5>
+                    <div class="metric-value {% if niveau_risque > 0.7 %}text-danger{% elif niveau_risque > 0.4 %}text-warning{% else %}text-success{% endif %}">
+                        {{ niveau_risque|default:"0.00"|floatformat:2 }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Taux de Précision</h5>
+                    <div class="metric-value">{{ taux_precision|default:"0.00"|floatformat:2 }}%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if alertes %}
+        <div class="alerts-list">
+            <h2>Alertes en Cours</h2>
+            {% for alerte in alertes %}
+                <div class="card mb-3 {% if alerte.niveau == 'critique' %}border-danger{% elif alerte.niveau == 'warning' %}border-warning{% else %}border-info{% endif %}">
+                    <div class="card-header {% if alerte.niveau == 'critique' %}bg-danger text-white{% elif alerte.niveau == 'warning' %}bg-warning{% else %}bg-info text-white{% endif %}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                {% if alerte.niveau == 'critique' %}
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                {% elif alerte.niveau == 'warning' %}
+                                    <i class="fas fa-exclamation-circle"></i>
+                                {% else %}
+                                    <i class="fas fa-info-circle"></i>
+                                {% endif %}
+                                {{ alerte.titre }}
+                            </h5>
+                            <span class="badge {% if alerte.niveau == 'critique' %}badge-light{% elif alerte.niveau == 'warning' %}badge-dark{% else %}badge-light{% endif %}">
+                                Probabilité: {{ alerte.probabilite|floatformat:2 }}%
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <p class="card-text">{{ alerte.description }}</p>
+                                
+                                {% if alerte.impact %}
+                                    <div class="impact mt-3">
+                                        <h6>Impact Potentiel</h6>
+                                        <p>{{ alerte.impact }}</p>
+                                    </div>
+                                {% endif %}
+
+                                {% if alerte.recommandations %}
+                                    <div class="recommendations mt-3">
+                                        <h6>Actions Recommandées</h6>
+                                        <ul class="list-unstyled">
+                                            {% for action in alerte.recommandations %}
+                                                <li><i class="fas fa-check"></i> {{ action }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <div class="metrics">
+                                    <div class="metric-item mb-3">
+                                        <h6>Délai Estimé</h6>
+                                        <p class="mb-0">{{ alerte.delai_estime }}</p>
+                                    </div>
+                                    <div class="metric-item mb-3">
+                                        <h6>Portée</h6>
+                                        <p class="mb-0">{{ alerte.portee }}</p>
+                                    </div>
+                                    <div class="metric-item">
+                                        <h6>KPIs Impactés</h6>
+                                        {% for kpi in alerte.kpis_impactes %}
+                                            <span class="badge badge-secondary mr-1">{{ kpi }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">Détectée le {{ alerte.date_detection|date:"d/m/Y H:i" }}</small>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-primary">Marquer comme vue</button>
+                                <button class="btn btn-sm btn-outline-success">Assigner</button>
+                                <button class="btn btn-sm btn-outline-danger">Ignorer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% if alertes.has_other_pages %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if alertes.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ alertes.previous_page_number }}">Précédent</a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in alertes.paginator.page_range %}
+                            <li class="page-item {% if alertes.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endfor %}
+
+                        {% if alertes.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ alertes.next_page_number }}">Suivant</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="alert alert-success">
+            Aucune alerte active pour le moment.
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.metric-value {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 1rem;
+}
+.metric-item {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 4px;
+}
+.metric-item h6 {
+    margin-bottom: 0.5rem;
+    color: #6c757d;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-paper-plane"></i> Nouveau message
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'communication:message_create' %}">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="destinataire" class="form-label">Destinataire</label>
+                            <select name="destinataire" id="destinataire" class="form-select" required>
+                                <option value="">Sélectionner un destinataire</option>
+                                {% for user in users %}
+                                    <option value="{{ user.id }}">{{ user.get_full_name|default:user.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="objet" class="form-label">Objet</label>
+                            <input type="text" name="objet" id="objet" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="contenu" class="form-label">Message</label>
+                            <textarea name="contenu" id="contenu" rows="5" class="form-control" required></textarea>
+                        </div>
+
+                        <div class="text-end">
+                            <a href="{% url 'communication:messages_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Envoyer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Documents{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Documents</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if documents %}
+        <div class="row">
+            {% for document in documents %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ document.titre }}</h5>
+                            <p class="card-text text-muted">
+                                <small>Type: {{ document.get_type_display }}</small>
+                            </p>
+                            {% if document.description %}
+                                <p class="card-text">{{ document.description|truncatewords:30 }}</p>
+                            {% endif %}
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    Ajouté le {{ document.date_creation|date:"d/m/Y" }}
+                                </small>
+                            </p>
+                            <a href="{% url 'clients_finaux:detail_document' document.id %}" class="btn btn-primary">
+                                Voir le détail
+                            </a>
+                            {% if document.fichier %}
+                                <a href="{{ document.fichier.url }}" class="btn btn-outline-secondary ml-2" target="_blank">
+                                    Télécharger
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Aucun document disponible pour le moment.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

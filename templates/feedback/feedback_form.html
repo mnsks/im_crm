@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Nouveau Feedback{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title mb-0">Nouveau Feedback</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        {% for field in form %}
+                        <div class="form-group mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">
+                                {{ field.label }}
+                                {% if field.field.required %}
+                                <span class="text-danger">*</span>
+                                {% endif %}
+                            </label>
+
+                            {% if field.name == 'note' %}
+                            <div class="rating-stars mb-2">
+                                {% for value, label in field.field.choices %}
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="{{ field.name }}"
+                                           id="{{ field.id_for_label }}_{{ value }}" value="{{ value }}"
+                                           {% if field.value|stringformat:"s" == value|stringformat:"s" %}checked{% endif %}>
+                                    <label class="form-check-label" for="{{ field.id_for_label }}_{{ value }}">
+                                        {% for i in "12345"|make_list %}
+                                        <i class="fas fa-star {% if forloop.counter <= value %}text-warning{% else %}text-muted{% endif %}"></i>
+                                        {% endfor %}
+                                        <br>
+                                        <small>{{ label }}</small>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ field }}
+                            {% endif %}
+
+                            {% if field.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ field.errors|join:", " }}
+                            </div>
+                            {% endif %}
+                            {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'feedback:feedback_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Retour
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-group label {
+        font-weight: 500;
+    }
+    .rating-stars .form-check {
+        margin-right: 1.5rem;
+    }
+    .rating-stars .form-check-input {
+        display: none;
+    }
+    .rating-stars .form-check-label {
+        cursor: pointer;
+        text-align: center;
+    }
+    .rating-stars .form-check-label:hover i.fa-star,
+    .rating-stars .form-check-input:checked + .form-check-label i.fa-star {
+        color: #ffc107 !important;
+    }
+    textarea {
+        resize: vertical;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Ajouter la classe form-control aux champs
+        $('select, textarea').addClass('form-control');
+
+        // Gérer le hover sur les étoiles
+        $('.rating-stars .form-check-label').hover(
+            function() {
+                $(this).prevAll('.form-check-label').addBack()
+                    .find('.fa-star').addClass('text-warning').removeClass('text-muted');
+                $(this).nextAll('.form-check-label')
+                    .find('.fa-star').removeClass('text-warning').addClass('text-muted');
+            },
+            function() {
+                if (!$(this).siblings('.form-check-input:checked').length) {
+                    $('.rating-stars .fa-star').removeClass('text-warning').addClass('text-muted');
+                }
+                let checked = $('.rating-stars .form-check-input:checked');
+                if (checked.length) {
+                    checked.next('.form-check-label').trigger('mouseenter');
+                }
+            }
+        );
+    });
+</script>
+{% endblock %}

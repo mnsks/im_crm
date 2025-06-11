@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Performance de l'Équipe</h1>
+    
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Performance Moyenne</h5>
+                    <div class="metric-value">{{ performance_moyenne|default:"0.00"|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Satisfaction Moyenne</h5>
+                    <div class="metric-value">{{ satisfaction_moyenne|default:"0.00"|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Qualité Moyenne</h5>
+                    <div class="metric-value">{{ qualite_moyenne|default:"0.00"|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if agents %}
+        <div class="agents-list">
+            <h2>Détails par Agent</h2>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Agent</th>
+                            <th>Performance</th>
+                            <th>Satisfaction</th>
+                            <th>Qualité</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for agent in agents %}
+                            <tr>
+                                <td>{{ agent.user.get_full_name }}</td>
+                                <td class="{% if agent.performance < 0.65 %}text-danger{% elif agent.performance < 0.8 %}text-warning{% else %}text-success{% endif %}">
+                                    {{ agent.performance|floatformat:2 }}
+                                </td>
+                                <td class="{% if agent.satisfaction < 0.65 %}text-danger{% elif agent.satisfaction < 0.8 %}text-warning{% else %}text-success{% endif %}">
+                                    {{ agent.satisfaction|floatformat:2 }}
+                                </td>
+                                <td class="{% if agent.qualite < 0.65 %}text-danger{% elif agent.qualite < 0.8 %}text-warning{% else %}text-success{% endif %}">
+                                    {{ agent.qualite|floatformat:2 }}
+                                </td>
+                                <td>
+                                    <a href="#" class="btn btn-sm btn-primary">Détails</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Aucune donnée disponible pour le moment.
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.metric-value {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 1rem;
+}
+</style>
+{% endblock %}

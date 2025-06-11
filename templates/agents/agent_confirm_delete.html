@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer l'agent{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3 class="card-title text-danger mb-4">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Confirmer la suppression
+                    </h3>
+                    
+                    <p class="mb-4">
+                        Êtes-vous sûr de vouloir supprimer l'agent
+                        <strong>{{ agent.get_full_name|default:agent.username }}</strong> ?
+                    </p>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle"></i>
+                        Cette action est irréversible. L'agent sera définitivement supprimé
+                        et toutes ses données seront perdues.
+                    </div>
+
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Confirmer la suppression
+                        </button>
+                        <a href="{% url 'agents:detail' pk=agent.pk %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Annuler
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

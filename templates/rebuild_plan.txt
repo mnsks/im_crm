@@ -1,0 +1,34 @@
+Plan de reconstruction du guide utilisateur sans duplications
+
+1. Structure du guide:
+   - En-tête (extensions, block content)
+   - Navigation (sommaire avec liens d'ancrage)
+   - Workflow complet (timeline des 8 étapes)
+   - Introduction générale
+   - Navigation globale
+   - Guide par rôle (admin, donneur, centre, agent, client)
+   - Fonctionnalités transverses
+   - FAQ unique (fusionnant les questions générales et par rôle)
+   - Annexes :
+     * Captures d'écran (section unique)
+     * Vidéo explicative (section unique)
+     * Glossaire
+     * Conseils pratiques
+   - Pied de page (retour navigation)
+   - Fermeture des balises (endblock)
+
+2. Sections dupliquées à éliminer:
+   - FAQ et dépannage + FAQ – Questions Fréquentes → Une seule section FAQ
+   - Captures d'écran sous "Annexes" et section séparée → Une seule section
+   - Vidéo explicative sous "Annexes" et section séparée → Une seule section
+
+3. Plan de fusion des FAQ:
+   - Conserver la structure "FAQ – Questions Fréquentes" avec sous-sections
+   - Incorporer les questions générales de "FAQ et dépannage"
+   - Maintenir les questions spécifiques par rôle
+
+4. Approche:
+   - Utiliser la structure du sommaire comme guide
+   - Copier chaque section une seule fois dans l'ordre logique
+   - Valider les liens d'ancrage dans le sommaire
+   - Assurer une seule fermeture {% endblock %} à la fin
