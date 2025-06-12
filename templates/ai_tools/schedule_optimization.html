@@ -4,11 +4,20 @@
 <div class="container">
     <h1>Optimisation des Plannings</h1>
 
+    {% if optimization_success %}
+        <div class="alert alert-success" role="alert">
+            Planning optimisé avec succès !
+        </div>
+    {% endif %}
+
     <div class="row mb-4">
         <div class="col-md-12">
             <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Période d'Optimisation</h4>
+                </div>
                 <div class="card-body">
-                    <form method="post" class="form-inline">
+                    <form method="post" class="form-inline justify-content-center">
                         {% csrf_token %}
                         <div class="form-group mx-sm-3 mb-2">
                             <label for="date_debut" class="mr-2">Date début</label>
@@ -18,102 +27,93 @@
                             <label for="date_fin" class="mr-2">Date fin</label>
                             <input type="date" class="form-control" id="date_fin" name="date_fin" required>
                         </div>
-                        <button type="submit" class="btn btn-primary mb-2">Optimiser</button>
+                        <button type="submit" class="btn btn-success mb-2">Optimiser</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    {% if planning %}
-        <div class="planning-container">
-            <h2>Planning Optimisé</h2>
-            
-            <div class="stats-row row mb-4">
-                <div class="col-md-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Score d'Optimisation</h5>
-                            <div class="metric-value">{{ planning.score|floatformat:2 }}</div>
-                        </div>
-                    </div>
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Planning des Agents</h4>
                 </div>
-                <div class="col-md-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Couverture</h5>
-                            <div class="metric-value">{{ planning.couverture|floatformat:2 }}%</div>
+                <div class="card-body">
+                    {% if planning %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Agent</th>
+                                        <th>Missions</th>
+                                        <th>Horaires</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for agent in planning %}
+                                        <tr>
+                                            <td>{{ agent.agent_name }}</td>
+                                            <td>
+                                                <ul class="list-unstyled">
+                                                    {% for mission in agent.missions %}
+                                                        <li>{{ mission.mission_name }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </td>
+                                            <td>
+                                                <ul class="list-unstyled">
+                                                    {% for mission in agent.missions %}
+                                                        <li>{{ mission.start_time }} - {{ mission.end_time }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Équilibre Charge</h5>
-                            <div class="metric-value">{{ planning.equilibre|floatformat:2 }}%</div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            Aucun planning n'a encore été généré.
                         </div>
-                    </div>
+                    {% endif %}
                 </div>
-                <div class="col-md-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Satisfaction Contraintes</h5>
-                            <div class="metric-value">{{ planning.satisfaction|floatformat:2 }}%</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Agent</th>
-                            {% for date in planning.dates %}
-                                <th>{{ date|date:"d/m" }}</th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for agent in planning.agents %}
-                            <tr>
-                                <td>{{ agent.nom }}</td>
-                                {% for creneau in agent.creneaux %}
-                                    <td class="{% if creneau.type == 'matin' %}bg-primary text-white{% elif creneau.type == 'aprem' %}bg-success text-white{% elif creneau.type == 'repos' %}bg-light{% endif %}">
-                                        {{ creneau.type|title }}
-                                    </td>
-                                {% endfor %}
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="mt-4">
-                <button class="btn btn-success">Valider le planning</button>
-                <button class="btn btn-secondary">Exporter en PDF</button>
             </div>
         </div>
-    {% endif %}
+    </div>
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} mt-3">
-                {{ message }}
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Agents Disponibles</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for agent in agents %}
+                            <li class="list-group-item">{{ agent.user.get_full_name }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
-        {% endfor %}
-    {% endif %}
-</div>
+        </div>
 
-<style>
-.metric-value {
-    font-size: 2rem;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 1rem;
-}
-.table td {
-    text-align: center;
-}
-</style>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Missions Actives</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for mission in missions %}
+                            <li class="list-group-item">{{ mission.name }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

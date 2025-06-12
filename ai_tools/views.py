@@ -6,6 +6,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from agents.models import Agent
+from missions.models import Mission
 from .models import (
     AnalyseSentiment,
     PredictionPerformance,
@@ -139,10 +141,63 @@ class ScheduleOptimizationView(LoginRequiredMixin, UserPassesTestMixin, Template
     def test_func(self):
         return self.request.user.role == 'centre'
 
+    def optimize_planning(self, agents, missions, start_date=None, end_date=None):
+        # Optimiser le planning
+        optimizer = ScheduleOptimizer()
+        prob, assignments = optimizer.create_optimization_model(agents, missions)
+        
+        # Résoudre le problème
+        status = prob.solve()
+        
+        # Préparer les résultats
+        planning = []
+        if status == 1:  # Si une solution est trouvée
+            for agent in agents:
+                agent_missions = []
+                for mission in missions:
+                    if assignments[(agent.id, mission.id)].value() == 1:
+                        agent_missions.append({
+                            'mission_id': mission.id,
+                            'mission_name': mission.name,
+                            'start_time': mission.start_time,
+                            'end_time': mission.end_time
+                        })
+                if agent_missions:
+                    planning.append({
+                        'agent_id': agent.id,
+                        'agent_name': agent.user.get_full_name(),
+                        'missions': agent_missions
+                    })
+        
+        return planning, status == 1
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # TODO: Implémenter la logique d'optimisation des plannings
+        centre = self.request.user.parent_centre
+        
+        # Récupérer les agents et missions du centre
+        agents = Agent.objects.filter(centre_appel=centre, disponible=True)
+        missions = Mission.objects.filter(centre=centre, status='active')
+        
+        # Optimiser le planning si demandé
+        planning = []
+        optimization_success = False
+        
+        if self.request.method == 'POST':
+            start_date = self.request.POST.get('date_debut')
+            end_date = self.request.POST.get('date_fin')
+            planning, optimization_success = self.optimize_planning(agents, missions, start_date, end_date)
+        
+        context.update({
+            'planning': planning,
+            'agents': agents,
+            'missions': missions,
+            'optimization_success': optimization_success
+        })
         return context
+
+    def post(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
 
 @method_decorator(login_required, name='dispatch')
 class SentimentAnalysisView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):

@@ -5,7 +5,7 @@ from django.db import models
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib import messages
 from django.template.loader import render_to_string
-from weasyprint import HTML
+import pdfkit
 from saisie.models import SaisieResultat
 from missions.models import Mission
 from .models import Rapport, Feedback
@@ -135,12 +135,24 @@ def generer_rapport_pdf(request, rapport_id):
         'feedbacks': rapport.feedbacks.all().order_by('-date')
     }
     
+    # Configuration de wkhtmltopdf
+    config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
+    
     # Générer le HTML
     html_string = render_to_string('rapports/rapport_pdf.html', context)
     
+    # Options pour la génération du PDF
+    options = {
+        'page-size': 'A4',
+        'encoding': 'UTF-8',
+        'margin-top': '0.75in',
+        'margin-right': '0.75in',
+        'margin-bottom': '0.75in',
+        'margin-left': '0.75in'
+    }
+    
     # Convertir en PDF
-    html = HTML(string=html_string)
-    pdf = html.write_pdf()
+    pdf = pdfkit.from_string(html_string, False, options=options, configuration=config)
     
     # Envoyer le PDF
     response = HttpResponse(pdf, content_type='application/pdf')
