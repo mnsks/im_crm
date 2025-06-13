@@ -129,7 +129,7 @@ def dashboard(request):
         if request.user.role == 'admin':
             logger.info('Redirection vers admin_dashboard')
             return redirect('core:admin_dashboard')
-        elif request.user.role in ['donneur_ordre', 'entreprise']:
+        elif request.user.role == 'donneur_ordre':
             logger.info('Redirection vers donneur_ordre_dashboard')
             return redirect('core:donneur_ordre_dashboard')
         elif request.user.role == 'centre':  # Correction ici
@@ -373,7 +373,7 @@ def admin_dashboard(request):
         })
 
 @login_required
-@user_passes_test(lambda u: u.role == 'entreprise')
+@user_passes_test(lambda u: u.role == 'donneur_ordre')
 def entreprise_dashboard(request):
     """Dashboard pour les entreprises donneuses d'ordre"""
     from django.db.models import Count, Avg
@@ -918,7 +918,7 @@ def settings(request):
     })
 
 def is_donneur_ordre(user):
-    return user.is_authenticated and user.role in ['donneur_ordre', 'entreprise']
+    return user.is_authenticated and user.role == 'donneur_ordre'
 
 import traceback
 

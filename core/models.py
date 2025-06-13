@@ -3,8 +3,7 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     ROLE_CHOICES = [
-        ('entreprise', "Entreprise Donneuse d'Ordre"),
-        ('donneur_ordre', "Donneur d'Ordre"),
+        ('donneur_ordre', "Entreprise Donneuse d'Ordre"),
         ('centre', "Centre d'Appels"),
         ('centre_appel', "Centre d'Appels (variante)"),
         ('agent', "Agent"),

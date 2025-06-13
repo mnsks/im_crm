@@ -1,17 +1,27 @@
 from django import forms
 from .models import Document
+from core.models import EntrepriseDonneuseOrdre
 
 class DocumentForm(forms.ModelForm):
     class Meta:
         model = Document
-        fields = ['titre', 'description', 'fichier', 'type']
+        fields = ['titre', 'description', 'fichier', 'type', 'entreprise']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),
             'type': forms.Select(attrs={'class': 'form-select'}),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, is_admin=False, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        # Ajouter le champ entreprise pour les administrateurs
+        if is_admin:
+            self.fields['entreprise'] = forms.ModelChoiceField(
+                queryset=EntrepriseDonneuseOrdre.objects.all(),
+                widget=forms.Select(attrs={'class': 'form-select'}),
+                required=True
+            )
+        
         # Ajouter les classes Bootstrap aux champs
         for field in self.fields.values():
             if not isinstance(field.widget, forms.CheckboxInput):

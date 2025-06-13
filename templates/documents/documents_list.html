@@ -68,7 +68,7 @@
                                         <i class="fas fa-download"></i>
                                     </a>
                                     {% if user.is_staff or user.entreprise == doc.entreprise %}
-                                    <a href="{% url 'document_edit' doc.id %}" class="btn btn-sm btn-outline-secondary">
+                                    <a href="{% url 'documents:document_edit' doc.id %}" class="btn btn-sm btn-outline-secondary">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <button type="button" class="btn btn-sm btn-outline-danger" 

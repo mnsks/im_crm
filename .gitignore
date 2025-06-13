@@ -1,6 +1,8 @@
 # Virtual environment
 venv/
 
+ crm_externalisation/settings-pythonanywhere.py
+
 # Python
 __pycache__/
 *.pyc

@@ -154,10 +154,6 @@ CELERY_TIMEZONE = 'Europe/Paris'
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Media files (Uploaded files)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
 # Login URL
 LOGIN_URL = 'core:login'
 LOGIN_REDIRECT_URL = 'core:dashboard'

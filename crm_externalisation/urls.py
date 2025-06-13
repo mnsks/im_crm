@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from core.views import guide_utilisateur
 
 urlpatterns = [
@@ -37,4 +39,4 @@ urlpatterns = [
     path('rapports/', include('rapports.urls', namespace='rapports')),
     path('communication/', include('communication.urls', namespace='communication')),
     path('client/', include('clients_finaux.urls')),  # URLs pour le client final
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) if settings.DEBUG else []

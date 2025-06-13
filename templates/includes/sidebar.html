@@ -204,6 +204,15 @@
             </div>
         </div>
 
+        <div class="nav-section">
+            <div class="nav-section-title">Documentation & Ressources</div>
+            <div class="nav-item">
+                <a href="{% url 'documents:document_list' %}" class="nav-link">
+                    <i class="fas fa-file-alt"></i>Documents
+                </a>
+            </div>
+        </div>
+
     {% elif user.role == 'donneur_ordre' %}
         <!-- Menu Donneur d'Ordre -->
         <div class="nav-section">

@@ -413,7 +413,7 @@
         }
 
         .topbar-toggler {
-            display: none;
+            display: block;
             background: none;
             border: none;
             padding: 0.25rem;
@@ -808,15 +808,45 @@
     <script src="{% static 'js/sidebar.js' %}"></script>
     
     <script>
-        // Toggle sidebar sur mobile
-        document.querySelector('.topbar-toggler').addEventListener('click', function() {
-            document.querySelector('.sidebar').classList.toggle('show');
+        // Gestion de la sidebar sur mobile
+        const sidebar = document.querySelector('.sidebar');
+        const content = document.querySelector('.content');
+        const toggler = document.querySelector('.topbar-toggler');
+        
+        // Créer l'overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'sidebar-overlay';
+        document.body.appendChild(overlay);
+        
+        // Toggle sidebar et overlay
+        toggler.addEventListener('click', function() {
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('show');
+            document.body.style.overflow = sidebar.classList.contains('show') ? 'hidden' : '';
         });
 
-        // Fermer la sidebar au clic sur le contenu en mode mobile
-        document.querySelector('.content').addEventListener('click', function() {
-            if (window.innerWidth <= 768) {
-                document.querySelector('.sidebar').classList.remove('show');
+        // Fermer au clic sur l'overlay
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('show');
+            overlay.classList.remove('show');
+            document.body.style.overflow = '';
+        });
+
+        // Fermer au clic sur le contenu en mode mobile
+        content.addEventListener('click', function() {
+            if (window.innerWidth <= 992) {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Gérer le redimensionnement de la fenêtre
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 992) {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+                document.body.style.overflow = '';
             }
         });
     </script>

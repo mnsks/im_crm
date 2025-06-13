@@ -13,8 +13,6 @@ def feedback_list(request):
         feedbacks = Feedback.objects.filter(agent=request.user)
     elif request.user.role == 'centre':
         feedbacks = Feedback.objects.filter(mission__centre=request.user.parent_centre)
-    elif request.user.role == 'entreprise':
-        feedbacks = Feedback.objects.filter(mission__entreprise=request.user.parent_entreprise)
     elif request.user.role == 'donneur_ordre':
         # Récupérer tous les feedbacks des missions de l'entreprise du donneur d'ordre
         feedbacks = Feedback.objects.filter(mission__entreprise=request.user.parent_entreprise)

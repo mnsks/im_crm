@@ -12,7 +12,7 @@ def missions_list(request):
         missions = Mission.objects.select_related('entreprise', 'centre').filter(agents=request.user)
     elif request.user.role == 'centre':
         missions = Mission.objects.select_related('entreprise', 'centre').filter(centre=request.user.parent_centre)
-    elif request.user.role == 'entreprise':
+    elif request.user.role == 'donneur_ordre':
         missions = Mission.objects.select_related('entreprise', 'centre').filter(entreprise=request.user.parent_entreprise)
     elif request.user.role == 'admin':
         missions = Mission.objects.select_related('entreprise', 'centre').all()
@@ -68,7 +68,7 @@ def mission_detail(request, pk):
         return redirect('missions:list')
     elif request.user.role == 'centre' and mission.centre != request.user.parent_centre:
         return redirect('missions:list')
-    elif request.user.role == 'entreprise' and mission.entreprise != request.user.parent_entreprise:
+    elif request.user.role == 'donneur_ordre' and mission.entreprise != request.user.parent_entreprise:
         return redirect('missions:list')
     
     context = {
@@ -79,7 +79,7 @@ def mission_detail(request, pk):
 
 @login_required
 def mission_create(request):
-    if request.user.role not in ['admin', 'entreprise']:
+    if request.user.role not in ['admin', 'donneur_ordre']:
         return redirect('missions:list')
     
     if request.method == 'POST':
@@ -99,7 +99,7 @@ def mission_update(request, pk):
     # Vérifier les permissions
     if request.user.role == 'admin':
         pass
-    elif request.user.role == 'entreprise' and mission.entreprise != request.user.parent_entreprise:
+    elif request.user.role == 'donneur_ordre' and mission.entreprise != request.user.parent_entreprise:
         return redirect('missions:list')
     else:
         return redirect('missions:list')
@@ -123,7 +123,7 @@ def mission_delete(request, pk):
     from django.contrib import messages
     if request.user.role == 'admin':
         pass
-    elif request.user.role == 'entreprise' and mission.entreprise != request.user.parent_entreprise:
+    elif request.user.role == 'donneur_ordre' and mission.entreprise != request.user.parent_entreprise:
         messages.error(request, "Vous n'avez pas le droit de supprimer cette mission.")
         return redirect('core:access_denied')
     elif request.user.role == 'centre' and mission.centre != request.user.parent_centre:
